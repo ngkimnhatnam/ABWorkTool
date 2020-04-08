@@ -1,0 +1,30 @@
+<%- include("../partials/header") %>
+
+<div class="container">
+	<header class="jumbotron">
+		<div class="container">
+			<h1>You are viewing all available units</h1>
+		</div>
+	</header>
+	<div class="container">
+		<div class="row">
+			<% units.forEach(function(unit){ %>
+				<div class="card" style="width: 18rem;">
+				  <img src="<%= unit.image %>" class="card-img-top" alt="...">
+				  <div class="card-body">
+					<h5 class="card-title"><%= unit.name %></h5>
+					<p class="card-text">Check in/out time is: <%=unit.checkinout%></p>
+					<a href="#" class="btn btn-primary">Go somewhere</a>
+				  </div>
+				</div>
+			<% }) %>
+		</div>
+		<a href="/unit/new">Add new units</a>
+	</div>
+	
+</div>
+
+
+
+
+<%- include("../partials/footer") %>

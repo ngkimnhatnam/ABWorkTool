@@ -1,0 +1,47 @@
+<%- include("../partials/header") %>
+
+<div class="container">
+	<div class="row">
+		<div style="width: 30%; margin: 25px auto;">
+			<h1 style="text-align: center">
+				Create new task
+			</h1>
+			<form action="/unit" method="POST">
+				<div class="form-group">
+					<input class="form-control" type="text" name="date" placeholder="Date">
+				</div>
+				<div class="form-group">
+					<input class="form-control" type="text" name="unit" placeholder="Which unit">
+				</div>
+				<div class="form-group">
+					<input class="form-control" type="text" name="worker" placeholder="Add worker">
+				</div>
+				<div class="form-group">
+					<input class="form-control" type="text" name="sidenote" placeholder="Add sidenote here">
+				</div>
+				<div class="form-group">
+					<button class="btn btn-lg btn-primary btn-block">
+						Submit
+					</button>
+				</div>
+		</form>
+			<a href="/task">Back to tasks</a>
+		</div>
+		
+		
+	</div>
+	
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+<%- include("../partials/footer") %>

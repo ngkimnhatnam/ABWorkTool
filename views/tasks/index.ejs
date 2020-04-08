@@ -1,0 +1,30 @@
+<%- include("../partials/header") %>
+
+<div class="container">
+	<header class="jumbotron">
+		<div class="container">
+			<h1>You are in main work station</h1>
+		</div>
+	</header>
+	<div class="row">
+		<% tasks.forEach(function(task){ %>
+		<div class="col border border border-primary">
+		    <div class="card" style="width: 18rem;">
+				<img src="" class="card-img-top" alt="...">
+				<div class="card-body">
+					<h5 class="card-title"><%=task.date%></h5>
+					<p class="card-text">Following units: <%= task.unit %> </p>
+					<a href="#" class="btn btn-primary">View task</a>
+				</div>
+			</div>
+		</div>
+		<% }) %>
+		
+	</div>
+	<a href="/task/new">Add new tasks</a>
+</div>
+
+
+
+
+<%- include("../partials/footer") %>
