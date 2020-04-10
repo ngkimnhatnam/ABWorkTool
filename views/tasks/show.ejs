@@ -1,0 +1,23 @@
+<%- include("../partials/header") %>
+	<header class="jumbotron">
+			<h1>Good morning, sunshine</h1>
+	</header>
+	<div class="container">
+		<div class="row">
+			<div class="card text-center" style="width: 40%;margin: auto;">
+				<div class="card-body">
+					<h5 class="card-title"><%= task.date %></h5>
+					<h6 class="card-subtitle mb-2 text-muted"><%= task.user %></h6>
+					<p class="card-text">Following assigned units: <%=task.unit%></p>
+					<p class="card-text">
+						Sidenote: <%= task.sidenote %>
+					</p>
+				</div>
+			</div>
+		</div>
+		<a class="row" style="justify-content: center;" href="/task">Back to allocated tasks</a>
+	</div>
+
+
+
+<%- include("../partials/footer") %>
