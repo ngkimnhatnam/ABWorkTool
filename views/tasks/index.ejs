@@ -1,29 +1,43 @@
-<%- include("../partials/header") %>
+<%- include("../partials/header", {date: date}) %>
 	<header class="jumbotron">
 		<h1>You are in main work station</h1>
 	</header>
 	<div class="container" style="padding: 0;">
 		<div class="row">
-			<% tasks.forEach(function(task){ %>
-				<div class="col-sm-4 mb-4">
-					<div class="card h-100">
-						<div class="card-body">
-							<h5 class="card-title"><%=task.date%></h5>
-							<p class="card-text">Following units: <%=task.unit%></p>
-							<a href="/task/<%=task._id%>" class="btn btn-primary">View</a>
-							<form action="/task/<%=task._id%>?_method=delete" method="POST">
-								<button class="btn btn-danger">Delete</button>
-							</form>
-						</div>
-					</div>
+			<div class="col-3">
+				<div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+					<% if(currentUser&&currentUser.isManager){%>
+					<a class="nav-link" href="/task/new">Add new task</a>
+					<% } %>
+					<a class="nav-link" href="/unit">View Units</a>
+					<a class="nav-link" href="/history"> View History</a>
+				  	<a class="nav-link" id="v-pills-settings-tab" data-toggle="pill" href="#v-pills-settings" role="tab" aria-controls="v-pills-settings" aria-selected="false">Settings</a>
 				</div>
-			<% }) %>
+			</div>
+			<div class="col-9">
+				<div class="row">
+					<% tasks.forEach(function(task){ %>
+						<div class="col-md-6 col-lg-4" style="margin-bottom: 20px;">
+							<div class="card h-100 text-center">
+								<div class="card-body">
+									<h5 class="card-title"><%=task.date%></h5>
+									<p class="card-text" style="font-size: 1.5em;"><strong><%=task.user%></strong> </p>
+									<p class="card-text"><%=task.unit%></p>
+									<a href="/task/<%=task._id%>" class="btn btn-primary">View</a>
+									<% if(currentUser&&currentUser.isManager){%>
+									<form action="/task/<%=task._id%>?_method=delete" method="POST" style="display: inline;">
+										<button class="btn btn-danger">Delete</button>
+									</form>
+									<% } %>
+								</div>
+							</div>
+						</div>
+					<% }) %>
+				</div>
+			
+			</div>
 		</div>
 	</div>
-	<a href="/task/new">Add new tasks</a>
-
-
-
-
+	
 
 <%- include("../partials/footer") %>

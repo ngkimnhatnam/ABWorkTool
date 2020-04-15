@@ -1,4 +1,4 @@
-<%- include("../partials/header") %>
+<%- include("../partials/header", {date: date}) %>
 	<header class="jumbotron">
 			<h1>Good morning, sunshine</h1>
 	</header>
@@ -12,6 +12,9 @@
 					<p class="card-text">
 						Sidenote: <%= task.sidenote %>
 					</p>
+					<% if(currentUser&&currentUser.isManager){%>
+					<a href="/task/<%=task._id%>/edit" class="btn btn-warning">Edit</a>
+					<% } %>
 				</div>
 			</div>
 		</div>

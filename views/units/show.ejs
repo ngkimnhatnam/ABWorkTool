@@ -1,4 +1,4 @@
-<%- include("../partials/header") %>
+<%- include("../partials/header", {date: date}) %>
 	<header class="jumbotron">
 			<h1><%= unit.name %></h1>
 	</header>
@@ -9,6 +9,7 @@
 					<div class="card-body">
 						<h5 class="card-title"><%= unit.name %></h5>
 						<p class="card-text">Check in/out time is: <%=unit.checkinout%></p>
+						<a href="/unit/<%=unit._id%>/edit" class="btn btn-warning">Edit</a>
 				    </div>
 				
 			</div>

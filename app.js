@@ -7,8 +7,18 @@ var express 		= require("express"),
 	Unit			= require("./models/unit"),
 	Task			= require("./models/task"),
 	methodOverride	= require("method-override"),
+	moment			= require("moment");
 	app 			= express();
 
+var thisMoment = new Date();
+thisMoment.setHours(0,0,0,0);
+var now = moment().format("ddd DD MMM YYYY");
+
+ 
+var mongoClient = require('mongodb').MongoClient;  
+var url = "mongodb://localhost";  
+var dbName 	= "airbnb";
+ 
 mongoose.connect("mongodb://localhost/airbnb",{ useNewUrlParser: true, useUnifiedTopology: true });
 
 app.use(bodyParser.urlencoded({extended: true}));
@@ -40,19 +50,65 @@ app.get("/", function(req,res){
 	res.render("landing");
 })
 
-//Index route list all TASKS
-app.get("/task", function(req,res){
-	Task.find({}, function(err, allTasks){
+//INDEX TASK
+app.get("/task",isLoggedIn, function(req,res){
+	
+	var taskArray = [];
+	var newArray = [];
+	
+	mongoClient.connect(url, function(err, client) {  
 		if(err){
-			console.log(err);
-		}else {
-			res.render("tasks/index", {tasks: allTasks});
+			throw err;  
 		}
-	});
+		console.log("This is working");
+		var db	= client.db(dbName);
+		var mysort = { date: 1 };
+  		db.collection("tasks").find().sort(mysort).toArray(function(err, result){
+    		if (err){
+				throw err;
+			}else {
+				result.forEach(function(task){
+					task.date.setHours(0,0,0,0);
+					if(task.date.getTime()>= thisMoment.getTime()){
+						task.date = moment(task.date).format("ddd DD MMM");
+						newArray.push(task);
+					}		
+				})
+				if(req.user.isManager){
+					res.render("tasks/index", {tasks: newArray, date: now});
+				}else {
+					newArray.forEach(function(task){
+						if(task.user === req.user.username){
+	 						console.log("This is current username: "+ req.user.username);
+						taskArray.push(task);
+						}
+					})
+					res.render("tasks/index", {tasks: taskArray, date: now});
+				}
+			} 	
+			console.log(result);
+    		client.close();
+  		});
+	}); 
 })
 
-//Show new TASK form route 
-app.get("/task/new", function(req,res){
+//HISTORY ROUTE
+app.get("/history",isLoggedIn, function(req,res){
+	viewHistory(30,req,res);
+})
+
+//HISTORY 90
+app.get("/history_90",isLoggedIn, function(req,res){
+	viewHistory(90,req,res);
+})
+
+//HISTORY 180
+app.get("/history_180",isLoggedIn, function(req,res){
+	viewHistory(180,req,res);
+})
+
+//NEW TASK
+app.get("/task/new",isLoggedIn, function(req,res){
 	
 	Unit.find({}, function(err, allUnits){
 		if(err){
@@ -63,20 +119,21 @@ app.get("/task/new", function(req,res){
 					console.log(err);
 				}else {
 					//console.log(allUsers);
-					res.render("tasks/new", {units: allUnits, users: allUsers});
+					res.render("tasks/new", {units: allUnits, users: allUsers, date: now});
 				}
 			})
 		}
 	});
 })
 
-//Create new TASK route
+//CREATE TASK
 app.post("/task", function(req,res){
 	
 	var date = req.body.date;
 	var worker = req.body.worker;
 	var unit = req.body.unit;
 	var sidenote = req.body.sidenote;
+	
 	var newTask = {date: date, user: worker, unit: unit, sidenote: sidenote};
 	console.log(req.body);
 	//Create new tasks and adds to DB
@@ -91,16 +148,55 @@ app.post("/task", function(req,res){
 	})
 })
 
-//Show specific TASK
+//SHOW TASK
 app.get("/task/:id", function(req,res){
 	Task.findById(req.params.id, function(err, foundTask){
 		if(err){
 			console.log(err);
 		}else {
-			res.render("tasks/show", {task: foundTask});
+			res.render("tasks/show", {task: foundTask, date: now});
 		}
 	})
 })
+
+//EDIT TASK
+app.get("/task/:id/edit", function(req,res){
+	var unitList = [];
+	var userList = [];
+	Unit.find({}, function(err,allUnits){
+		if(err){
+			console.log(err);
+		}else {
+			unitList = allUnits;
+		}
+	})
+	User.find({}, function(err,allUsers){
+		if(err){
+			console.log(err);
+		}else {
+			userList = allUsers;
+		}
+	})
+	Task.findById(req.params.id, function(err,foundTask){
+		if(err){
+			console.log(err);
+		}else {
+			res.render("tasks/edit", {task: foundTask, units: unitList, users: userList, date: now});
+		}
+	})
+})
+
+//UPDATE TASK
+app.put("/task/:id", function(req,res){
+	Task.findByIdAndUpdate(req.params.id, req.body,function(err, updatedTask){
+		if(err){
+			res.redirect("/task");
+		}else {
+			res.redirect("/task/"+req.params.id);
+		}
+	})
+})
+
 
 //DELETE TASK
 app.delete("/task/:id", function(req,res){
@@ -113,23 +209,27 @@ app.delete("/task/:id", function(req,res){
 	})
 })
 
-//Show ALL UNIT route
-app.get("/unit", function(req,res){
+//INDEX UNIT
+app.get("/unit",isLoggedIn, function(req,res){
+	var toUnit = {
+		route: "/unit/new",
+		name: "new unit"
+	};
 	Unit.find({}, function(err, allUnits){
 		if(err){
 			console.log(err);
 		}else {
-			res.render("units/", {units: allUnits});
+			res.render("units/", {units: allUnits, date: now, route: toUnit});
 		}
 	});
 })
 
-//Show new UNIT form route
+//NEW UNIT
 app.get("/unit/new", function(req,res){
-	res.render("units/new");
+	res.render("units/new", {date: now});
 })
 
-//Create new UNIT, then redirects to show all units
+//CREATE UNIT
 app.post("/unit", function(req,res){
 	var unitName = req.body.name;
 	var unitImage = req.body.image;
@@ -147,13 +247,35 @@ app.post("/unit", function(req,res){
 	})
 })
 
-//Show specific UNIT route
+//SHOW UNIT
 app.get("/unit/:id", function(req,res){
 	Unit.findById(req.params.id, function(err, foundUnit){
 		if(err){
 			console.log(err);
 		}else {
-			res.render("units/show", {unit: foundUnit});
+			res.render("units/show", {unit: foundUnit, date: now});
+		}
+	})
+})
+
+//EDIT UNIT 
+app.get("/unit/:id/edit", function(req,res){
+	Unit.findById(req.params.id, function(err, foundUnit){
+		if(err){
+			console.log(err);
+		}else {
+			res.render("units/edit", {unit: foundUnit, date: now});
+		}
+	})
+})
+
+//UPDATE UNIT
+app.put("/unit/:id",function(req,res){
+	Unit.findByIdAndUpdate(req.params.id,req.body.unit, function(err,updatedUnit){
+		if(err){
+			res.redirect("/unit");
+		}else {
+			res.redirect("/unit/"+req.params.id);
 		}
 	})
 })
@@ -208,12 +330,56 @@ app.get("/logout", function(req,res){
 	res.redirect("/");
 })
 
+function viewHistory(number,req,res){
+	var taskArray = [];
+	var newArray = [];
+	var toCurrent = {
+		route: "/task",
+		name: "Current Tasks"
+	}
+	mongoClient.connect(url, function(err, client) {  
+		if(err){
+			throw err;  
+		}
+		var db	= client.db(dbName);
+		var mysort = { date: 1 };
+  		db.collection("tasks").find().sort(mysort).toArray(function(err, result){
+    		if (err){
+				throw err;
+			}else {
+				result.forEach(function(task){
+					task.date.setHours(0,0,0,0);
+					if((thisMoment.getTime()-task.date.getTime())/(1000*3600*24)<number&&task.date.getTime() < thisMoment.getTime()){
+						task.date = moment(task.date).format("ddd DD MMM");
+						newArray.push(task);
+					}		
+				})
+				if(req.user.isManager){
+					res.render("tasks/history", {tasks: newArray, date: now, route: toCurrent});
+				}else {
+					newArray.forEach(function(task){
+						if(task.user === req.user.username){
+							taskArray.push(task);
+						}
+					})
+					res.render("tasks/history", {tasks: taskArray, date: now, route: toCurrent});
+				}
+			} 	
+			console.log(result);
+    		client.close();
+  		});
+	}); 
+}
+
 function isLoggedIn(req, res, next){
 	if(req.isAuthenticated()){
+		console.log(req.user);
 		return next();
 	}
-	res.redirect("/login");
+	res.redirect("/");
 }
+
+
 
 app.listen(3000, function(){
 	console.log("Server running");

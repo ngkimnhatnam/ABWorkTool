@@ -1,26 +1,38 @@
-<%- include("../partials/header") %>
+<%- include("../partials/header", {date: date}) %>
 	<header class="jumbotron">
 			<h1>You are viewing all available units</h1>
 	</header>
 	<div class="container" style="padding: 0;">
 		<div class="row">
-			<% units.forEach(function(unit){ %>
-				<div class="col-sm-4 mb-4">
-					<div class="card h-100">
-					  <img src="<%= unit.image %>" class="card-img-top" alt="...">
-					  <div class="card-body">
-						<h5 class="card-title"><%= unit.name %></h5>
-						<p class="card-text">Check in/out time is: <%=unit.checkinout%></p>
-						<a href="/unit/<%= unit._id %>" class="btn btn-primary">View the unit</a>
-						<form action="/unit/<%=unit._id%>?_method=delete" method="POST">
-							<button class="btn btn-danger">Delete</button>
-						</form>
-					  </div>
-					</div>
+			<div class="col-3">
+				<div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+				  <a class="nav-link" href="<%=route.route%>">Add <%=route.name%></a>
+				  <a class="nav-link" href="/task"> View Tasks</a>
+				  <a class="nav-link" id="v-pills-settings-tab" data-toggle="pill" href="#v-pills-settings" role="tab" aria-controls="v-pills-settings" aria-selected="false">Settings</a>
 				</div>
-			<% }) %>
+			</div>
+			<div class="col-9">
+				<div class="row">
+					<% units.forEach(function(unit){ %>
+						<div class="col-md-6 col-xl-4">
+							<div class="card h-100">
+								<img src="<%= unit.image %>" class="card-img-top" alt="...">
+								<div class="card-body">
+									<h5 class="card-title"><%= unit.name %></h5>
+									<p class="card-text">Check in/out time is: <%=unit.checkinout%></p>
+									<a href="/unit/<%= unit._id %>" class="btn btn-primary">View the unit</a>
+									<% if(currentUser&&currentUser.isManager){%>
+									<form action="/unit/<%=unit._id%>?_method=delete" method="POST">
+										<button class="btn btn-danger">Delete</button>
+									</form>
+									<% } %>
+					  			</div>
+							</div>
+						</div>
+					<% }) %>
+				</div>
+			</div>
 		</div>
-		<a href="/unit/new">Add new units</a>
 	</div>
 
 <%- include("../partials/footer") %>

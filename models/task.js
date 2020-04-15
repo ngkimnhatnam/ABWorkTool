@@ -1,9 +1,7 @@
 var mongoose = require("mongoose");
 
 var taskSchema	=	mongoose.Schema({
-	date: String,
-	user: String,
-	unit: String,
+	date: Date,
 	// user: {
 	// 	id: {
 	// 		type: mongoose.Schema.Types.ObjectId,
@@ -11,6 +9,9 @@ var taskSchema	=	mongoose.Schema({
 	// 	},
 	// 	username: String
 	// },
+	user: String,
+	unit: String,
+	
 	// unit: {
 	// 	id: {
 	// 		type: mongoose.Schema.Types.ObjectId,

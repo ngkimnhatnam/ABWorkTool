@@ -16,3 +16,22 @@ Edit	/task/:id/edit	GET		Show edit form for one task =>	Task.findById()
 Update	/task/:id		PUT		Update specific task, redirects	Task.findByIdAndUpdate()
 Destroy	/task/:id		DELETE	Delete task, redirects			Task.findByidAndRemove()
 
+#DONE
+* 7 RESTful routes for task&unit
+* Signup, login, master/common account
+* Vertical authorization (users see own tasks only)
+* Horizontal authorization (master account set up/edit/delete tasks/unit)
+* Sorting by date + reformat date + system time via Moment JS
+* Implement Archive/History functionality (comparing dates and archive obsoletes)
+
+#TO BE DONE
+
+* Master account create common accs (seperate database for each master acc?)
+* Notification systems to master account of completed task
+* Sort by date, unit, user
+* Color code imcoming tasks by date(yellow for near & green for faraway)
+* Notification of upcoming task
+* Adjust layout, font, color, background
+
+
+
