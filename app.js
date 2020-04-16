@@ -12,8 +12,8 @@ var express 		= require("express"),
 
 var thisMoment = new Date();
 thisMoment.setHours(0,0,0,0);
+var minDate = moment().format("YYYY-MM-DD");
 var now = moment().format("ddd DD MMM YYYY");
-
  
 var mongoClient = require('mongodb').MongoClient;  
 var url = "mongodb://localhost";  
@@ -60,7 +60,7 @@ app.get("/task",isLoggedIn, function(req,res){
 		if(err){
 			throw err;  
 		}
-		console.log("This is working");
+		
 		var db	= client.db(dbName);
 		var mysort = { date: 1 };
   		db.collection("tasks").find().sort(mysort).toArray(function(err, result){
@@ -70,7 +70,7 @@ app.get("/task",isLoggedIn, function(req,res){
 				result.forEach(function(task){
 					task.date.setHours(0,0,0,0);
 					if(task.date.getTime()>= thisMoment.getTime()){
-						task.date = moment(task.date).format("ddd DD MMM");
+						task.date = moment(task.date).format("ddd DD MMM YYYY");
 						newArray.push(task);
 					}		
 				})
@@ -79,32 +79,16 @@ app.get("/task",isLoggedIn, function(req,res){
 				}else {
 					newArray.forEach(function(task){
 						if(task.user === req.user.username){
-	 						console.log("This is current username: "+ req.user.username);
-						taskArray.push(task);
+							taskArray.push(task);
 						}
 					})
 					res.render("tasks/index", {tasks: taskArray, date: now});
 				}
 			} 	
-			console.log(result);
+			//console.log(result);
     		client.close();
   		});
 	}); 
-})
-
-//HISTORY ROUTE
-app.get("/history",isLoggedIn, function(req,res){
-	viewHistory(30,req,res);
-})
-
-//HISTORY 90
-app.get("/history_90",isLoggedIn, function(req,res){
-	viewHistory(90,req,res);
-})
-
-//HISTORY 180
-app.get("/history_180",isLoggedIn, function(req,res){
-	viewHistory(180,req,res);
 })
 
 //NEW TASK
@@ -119,7 +103,7 @@ app.get("/task/new",isLoggedIn, function(req,res){
 					console.log(err);
 				}else {
 					//console.log(allUsers);
-					res.render("tasks/new", {units: allUnits, users: allUsers, date: now});
+					res.render("tasks/new", {units: allUnits, users: allUsers, date: now, thisMoment: minDate});
 				}
 			})
 		}
@@ -150,13 +134,20 @@ app.post("/task", function(req,res){
 
 //SHOW TASK
 app.get("/task/:id", function(req,res){
+	var toBeShownTask;
 	Task.findById(req.params.id, function(err, foundTask){
 		if(err){
 			console.log(err);
 		}else {
+			// toBeShownTask = foundTask;
+			// toBeShownTask.date.setHours(0,0,0,0);
+			// console.log("Be4 format toBESHOWNDate "+toBeShownTask.date);
+			// toBeShownTask.date = moment(toBeShownTask.date).format("LLL");
+			// console.log("After format toBESHOWNDate "+toBeShownTask.date);
 			res.render("tasks/show", {task: foundTask, date: now});
 		}
 	})
+	
 })
 
 //EDIT TASK
@@ -181,7 +172,8 @@ app.get("/task/:id/edit", function(req,res){
 		if(err){
 			console.log(err);
 		}else {
-			res.render("tasks/edit", {task: foundTask, units: unitList, users: userList, date: now});
+			console.log(foundTask);
+			res.render("tasks/edit", {task: foundTask, units: unitList, users: userList, date: now, thisMoment: minDate});
 		}
 	})
 })
@@ -298,7 +290,7 @@ app.get("/register", function(req,res){
 
 //Create new USER then redirects
 app.post("/register", function(req,res){
-	if(req.body.manager==="on"){
+	if(req.body.manager==="on" && req.body.master==="master123"){
 		var newUser = new User({username: req.body.username, isManager: true});
 	}else {
 		var newUser = new User({username: req.body.username, isManager: false});
@@ -365,11 +357,25 @@ function viewHistory(number,req,res){
 					res.render("tasks/history", {tasks: taskArray, date: now, route: toCurrent});
 				}
 			} 	
-			console.log(result);
     		client.close();
   		});
 	}); 
 }
+
+//HISTORY ROUTE
+app.get("/history",isLoggedIn, function(req,res){
+	viewHistory(30,req,res);
+})
+
+//HISTORY 90
+app.get("/history_90",isLoggedIn, function(req,res){
+	viewHistory(90,req,res);
+})
+
+//HISTORY 180
+app.get("/history_180",isLoggedIn, function(req,res){
+	viewHistory(180,req,res);
+})
 
 function isLoggedIn(req, res, next){
 	if(req.isAuthenticated()){

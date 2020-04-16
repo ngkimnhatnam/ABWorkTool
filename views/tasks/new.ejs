@@ -8,7 +8,7 @@
 			</h1>
 			<form action="/task" method="POST">
 				<div class="form-group">
-					<input class="form-control" type="date" name="date" placeholder="Date">
+					<input class="form-control" type="date" name="date" min="<%=thisMoment%>">
 				</div>
 				<div class="form-group">
 					<div class="input-group mb-3">
@@ -25,16 +25,10 @@
 				</div>
 				<div class="form-group">
 					<div class="input-group">
-					  <select class="custom-select" id="inputGroupSelect04" aria-label="Example select with button addon" name="unit">
-						<option value="">Choose the unit</option>
 						<% units.forEach(function(unit){ %>
-							<option value="<%=unit.name%>"><%=unit.name%></option>
-						<% }) %>
-						
-					  </select>
-					  <div class="input-group-append">
-						<button class="btn btn-outline-secondary" type="button">Add unit</button>
-					  </div>
+					  		<input type="checkbox" id="chooseUnit" name="unit" value="<%=unit.name%>">
+							<label for="chooseUnit"><%=unit.name%></label>
+						<% }) %>					  
 					</div>
 				</div>
 				<div class="form-group">
@@ -45,7 +39,7 @@
 						Add
 					</button>
 				</div>
-		</form>
+			</form>
 			<a href="/task">Back to tasks</a>
 		</div>
 		

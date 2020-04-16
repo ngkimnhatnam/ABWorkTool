@@ -23,13 +23,14 @@ Destroy	/task/:id		DELETE	Delete task, redirects			Task.findByidAndRemove()
 * Horizontal authorization (master account set up/edit/delete tasks/unit)
 * Sorting by date + reformat date + system time via Moment JS
 * Implement Archive/History functionality (comparing dates and archive obsoletes)
+* Color code imcoming tasks by date(yellow for near & green for faraway)
+* Master account created via master code
 
 #TO BE DONE
-
-* Master account create common accs (seperate database for each master acc?)
+* Randomize password when creating sub accs
+* Password retrieval via email & password change
 * Notification systems to master account of completed task
 * Sort by date, unit, user
-* Color code imcoming tasks by date(yellow for near & green for faraway)
 * Notification of upcoming task
 * Adjust layout, font, color, background
 

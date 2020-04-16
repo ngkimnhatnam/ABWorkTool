@@ -19,7 +19,11 @@
 					<% tasks.forEach(function(task){ %>
 						<div class="col-md-6 col-lg-4" style="margin-bottom: 20px;">
 							<div class="card h-100 text-center">
-								<div class="card-body">
+								<% if(task.date == date){ %>
+										<div class="card-body border-style border border-warning ">
+									<% } else {%>
+										<div class="card-body border border-style border-success">
+									<% } %>
 									<h5 class="card-title"><%=task.date%></h5>
 									<p class="card-text" style="font-size: 1.5em;"><strong><%=task.user%></strong> </p>
 									<p class="card-text"><%=task.unit%></p>

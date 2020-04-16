@@ -5,10 +5,15 @@
 	<div class="container">
 		<div class="row">
 			<div class="card text-center" style="width: 40%;margin: auto;">
-				<div class="card-body">
-					<h5 class="card-title"><%= task.date %></h5>
-					<h6 class="card-subtitle mb-2 text-muted"><%= task.user %></h6>
-					<p class="card-text">Following assigned units: <%=task.unit%></p>
+				<div class="card-body border-style border border-dark">
+				<h5 class="card-title"><%= task.date.toDateString() %></h5>
+				<h6 class="card-subtitle mb-2 text-muted"><%= task.user %></h6>
+				<p class="card-text">Following assigned units:</p> 
+					<ul style="list-style: none;">
+						<% task.unit.forEach(function(name){ %>
+							<li><%=name%></li>
+						<% }) %>
+					</ul>					
 					<p class="card-text">
 						Sidenote: <%= task.sidenote %>
 					</p>

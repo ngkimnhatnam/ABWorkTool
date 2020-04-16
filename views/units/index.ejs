@@ -14,15 +14,15 @@
 			<div class="col-9">
 				<div class="row">
 					<% units.forEach(function(unit){ %>
-						<div class="col-md-6 col-xl-4">
+						<div class="col-md-6 col-xl-4" style="margin-bottom: 20px;">
 							<div class="card h-100">
 								<img src="<%= unit.image %>" class="card-img-top" alt="...">
 								<div class="card-body">
 									<h5 class="card-title"><%= unit.name %></h5>
 									<p class="card-text">Check in/out time is: <%=unit.checkinout%></p>
-									<a href="/unit/<%= unit._id %>" class="btn btn-primary">View the unit</a>
+									<a href="/unit/<%= unit._id %>" class="btn btn-primary">View unit</a>
 									<% if(currentUser&&currentUser.isManager){%>
-									<form action="/unit/<%=unit._id%>?_method=delete" method="POST">
+									<form action="/unit/<%=unit._id%>?_method=delete" method="POST" style="display: inline;">
 										<button class="btn btn-danger">Delete</button>
 									</form>
 									<% } %>

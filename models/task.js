@@ -10,8 +10,9 @@ var taskSchema	=	mongoose.Schema({
 	// 	username: String
 	// },
 	user: String,
-	unit: String,
-	
+	unit: [
+		
+	],
 	// unit: {
 	// 	id: {
 	// 		type: mongoose.Schema.Types.ObjectId,
