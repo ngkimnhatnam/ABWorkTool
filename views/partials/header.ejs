@@ -20,9 +20,9 @@
 				<ul class="navbar-nav">		
 					<li class="nav-item"><%=date%></li>
 					<% if(currentUser&&currentUser.isManager){%>
-				  	<li class="nav-item">Signed in as Admin: <%= currentUser.username%></li>
+				  	<li class="nav-item">Signed in as Admin: <%= currentUser.nickname%></li>
 					<% } else {%>
-					<li class="nav-item">Signed in as: <%= currentUser.username%></li>
+					<li class="nav-item">Signed in as: <%= currentUser.nickname%></li>
 					<% } %>
 					<li class="nav-item nav-link"><a href="/logout">Log out</a></li>
 				</ul>

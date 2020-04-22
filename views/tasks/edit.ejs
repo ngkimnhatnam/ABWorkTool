@@ -15,11 +15,13 @@
 					  <div class="input-group-prepend">
 						<label class="input-group-text" for="inputGroupSelect01">Worker</label>
 					</div>
-					<select class="custom-select" id="inputGroupSelect01" name="worker">
-						<option value="<%=task.user%>" selected><%=task.user%></option>
+					<select class="custom-select" id="inputGroupSelect01" name="user">
+						<option value="<%=task.user.id%>" selected><%=task.user.nickname%></option>
+						
 						<% users.forEach(function(user){ %>
-							<% if(user.username !== task.user){ %>
-								<option value="<%=user.username%>"><%=user.username%></option>
+						<% console.log("list of users "+ user); %>
+							<% if(user._id.toString() !== task.user.id.toString()){ %>
+								<option value="<%=user._id%>"><%=user.nickname%></option>
 							<% } %>
 						<% }) %>
 					  </select>

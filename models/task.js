@@ -2,24 +2,20 @@ var mongoose = require("mongoose");
 
 var taskSchema	=	mongoose.Schema({
 	date: Date,
-	// user: {
-	// 	id: {
-	// 		type: mongoose.Schema.Types.ObjectId,
-	// 		ref: "User"
-	// 	},
-	// 	username: String
-	// },
-	user: String,
+	user: {
+		id: String,
+		nickname: String
+	},
+	//user: String,
 	unit: [
 		
 	],
-	// unit: {
-	// 	id: {
-	// 		type: mongoose.Schema.Types.ObjectId,
-	// 		ref: "Unit"
-	// 	},
-	// 	name: String
-	// },
+	feedback: [
+		{
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "Feedback"
+		}
+	],
 	sidenote: String
 });
 

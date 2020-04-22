@@ -1,0 +1,33 @@
+<%- include("../partials/header", {date: date}) %>
+	<header class="jumbotron">
+			<h1>Good morning, sunshine</h1>
+	</header>
+	<div class="container">
+		<div class="row">
+			<div class="card text-center" style="width: 40%;margin: auto;">
+				<div class="card-body border-style border border-dark">
+				<h5 class="card-title"><%= task.date.toDateString() %></h5>
+				<h6 class="card-subtitle mb-2 text-muted"><%= task.user.nickname %></h6>
+					<form action="/task/<%=task._id%>/feedback" method="POST">
+						<div class="form-group">
+							<label for="feedbackContent">Enter your feedback here:</label>
+							<textarea id="feedbackContent" name="feedback[text]" class="card-text" rows="10" cols="40"></textarea> 	
+						</div>
+										
+						<p class="card-text">
+							Sidenote: <%= task.sidenote %>
+						</p>
+						<% if(currentUser&&currentUser.isManager){%>
+						<a href="/task/<%=task._id%>/feedback/edit" class="btn btn-warning">Edit</a>
+						<% } %>
+						<div class="form-group">
+							<button class="btn btn-success">Add</button>
+						</div>
+					</form>
+					
+				</div>
+			</div>
+		</div>
+		<a class="row" style="justify-content: center;" href="/task">Back to allocated tasks</a>
+	</div>
+<%- include("../partials/footer") %>

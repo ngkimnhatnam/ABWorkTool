@@ -1,0 +1,50 @@
+<%- include("../partials/header", {date: date}) %>
+	<header class="jumbotron">
+		<h1>You are in main work station</h1>
+	</header>
+	<div class="container" style="padding: 0;">
+		<div class="row">
+			<div class="col-3">
+				<div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+					<% if(currentUser&&currentUser.isManager){%>
+					<a class="nav-link" href="/task/new">Add new task</a>
+					<% } %>
+					<a class="nav-link" href="/unit">View Units</a>
+					<a class="nav-link" href="/history"> View History</a>
+				  	<a class="nav-link" data-toggle="collapse" href="#collapseSetting" aria-expanded="true" aria-controls="collapseSetting">Settings</a>
+					<div class="collapse" id="collapseSetting">
+						<ul class="list-group list-group-flush">
+							<li class="list-group-item list-group-item-action"><a class="nav-link" href="/change_password">Change password</a></li>
+							<li class="list-group-item list-group-item-action"><a class="nav-link" href="/sort_option">Sorting options</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="col-9">
+				<div class="row">
+					<div class="container">
+						<h2>
+							Change your password here:
+						</h2>
+						<form action="/change_password/<%=user._id%>?_method=PUT" method="POST">
+							<div class="form-group">
+								<input class="form-control" type="password" name="password" placeholder="New password:" required>
+							</div>
+							<div class="form-group">
+								<input class="form-control" type="password" name="retype" placeholder="Confirm password:" required>
+							</div>
+							<div class="form-group">
+								<button class="btn btn-lg btn-primary btn-block">
+									Change 
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			
+			</div>
+		</div>
+	</div>
+	
+
+<%- include("../partials/footer") %>

@@ -13,12 +13,13 @@
 				<div class="form-group">
 					<div class="input-group mb-3">
 					  <div class="input-group-prepend">
-						<label class="input-group-text" for="inputGroupSelect01">Worker</label>
+						<label class="input-group-text" for="inputGroupSelect011">Worker</label>
 					  </div>
-					  <select class="custom-select" id="inputGroupSelect01" name="worker">
+					  <select class="custom-select" id="inputGroupSelect011" name="user">
 						<option value="">Assign new worker</option>
+						  
 						<% users.forEach(function(user){ %>
-							<option value="<%=user.username%>"><%=user.username%></option>
+							<option value="<%=user._id%>"><%=user.nickname%></option>
 						<% }) %>
 					  </select>
 					</div>

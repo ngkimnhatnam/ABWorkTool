@@ -6,9 +6,12 @@ var express 		= require("express"),
 	User			= require("./models/user"),
 	Unit			= require("./models/unit"),
 	Task			= require("./models/task"),
+	Feedback		= require("./models/feedback"),
 	methodOverride	= require("method-override"),
-	moment			= require("moment");
+	moment			= require("moment"),
+	nodemailer		= require("nodemailer"),
 	app 			= express();
+	
 
 var thisMoment = new Date();
 thisMoment.setHours(0,0,0,0);
@@ -18,6 +21,7 @@ var now = moment().format("ddd DD MMM YYYY");
 var mongoClient = require('mongodb').MongoClient;  
 var url = "mongodb://localhost";  
 var dbName 	= "airbnb";
+var sortMethod = "date";
  
 mongoose.connect("mongodb://localhost/airbnb",{ useNewUrlParser: true, useUnifiedTopology: true });
 
@@ -52,48 +56,125 @@ app.get("/", function(req,res){
 
 //INDEX TASK
 app.get("/task",isLoggedIn, function(req,res){
-	
 	var taskArray = [];
 	var newArray = [];
 	
 	mongoClient.connect(url, function(err, client) {  
-		if(err){
-			throw err;  
-		}
-		
+		if(err){throw err;}
 		var db	= client.db(dbName);
-		var mysort = { date: 1 };
-  		db.collection("tasks").find().sort(mysort).toArray(function(err, result){
-    		if (err){
-				throw err;
-			}else {
-				result.forEach(function(task){
-					task.date.setHours(0,0,0,0);
-					if(task.date.getTime()>= thisMoment.getTime()){
-						task.date = moment(task.date).format("ddd DD MMM YYYY");
-						newArray.push(task);
-					}		
-				})
-				if(req.user.isManager){
-					res.render("tasks/index", {tasks: newArray, date: now});
+			var mysort = { date: 1 };
+			db.collection("tasks").find().sort(mysort).toArray(function(err, result){
+				if (err){
+					throw err;
 				}else {
-					newArray.forEach(function(task){
-						if(task.user === req.user.username){
-							taskArray.push(task);
-						}
+					result.forEach(function(task){
+						task.date.setHours(0,0,0,0);
+						if(task.date.getTime()>= thisMoment.getTime()){
+							task.date = moment(task.date).format("ddd DD MMM YYYY");
+							newArray.push(task);
+						}		
 					})
-					res.render("tasks/index", {tasks: taskArray, date: now});
-				}
-			} 	
-			//console.log(result);
-    		client.close();
-  		});
+					if(req.user.isManager){
+						res.render("tasks/index", {tasks: newArray, date: now, user: req.user});
+					}else {
+						newArray.forEach(function(task){
+							if(task.user.id.toString() === req.user._id.toString()){
+								taskArray.push(task);
+							}
+						})
+						res.render("tasks/index", {tasks: taskArray, date: now,user: req.user});
+					}
+				} 	
+				//console.log(result);
+				client.close();
+			});
 	}); 
+})
+
+//SORT OPTION USER
+app.get("/sort_option/user/:id", function(req,res){
+	
+	var currentTasksArray = [];
+	var taskPerUserArray = [];
+	
+	User.findById(req.params.id, function(err,foundUser){
+		if(err){
+			console.log(err);
+		}else {
+			mongoClient.connect(url, function(err, client) {  
+				if(err){throw err;}
+				var db	= client.db(dbName);
+					var mysort = { date: 1 };	db.collection("tasks").find().sort(mysort).toArray(function(err, result){
+						if (err){
+							throw err;
+						}else {
+							result.forEach(function(task){
+								task.date.setHours(0,0,0,0);
+								if(task.date.getTime()>= thisMoment.getTime()){
+									task.date = moment(task.date).format("ddd DD MMM YYYY");
+									currentTasksArray.push(task);
+								}								
+							})
+							currentTasksArray.forEach(function(task){
+								if(foundUser._id.toString() === task.user.id.toString()){
+									taskPerUserArray.push(task);	
+								}
+							})
+							if(req.user.isManager){
+								res.render("tasks/index", {tasks: taskPerUserArray, date: now, user: req.user});
+							}
+						} 	
+						client.close();
+					});
+			});
+		}
+	})
+})
+
+//SORT OPTION UNIT
+app.get("/sort_option/unit/:id", function(req,res){
+	var currentTasksArray = [];
+	var taskPerUnitArray = [];
+	
+	Unit.findById(req.params.id, function(err,foundUnit){
+		if(err){
+			console.log(err);
+		}else {
+			mongoClient.connect(url, function(err, client) {  
+				if(err){throw err;}
+				var db	= client.db(dbName);
+					var mysort = { date: 1 };
+					db.collection("tasks").find().sort(mysort).toArray(function(err, result){
+						if (err){
+							throw err;
+						}else {
+							result.forEach(function(task){
+								task.date.setHours(0,0,0,0);
+								if(task.date.getTime()>= thisMoment.getTime()){
+									task.date = moment(task.date).format("ddd DD MMM YYYY");
+									currentTasksArray.push(task);
+								}								
+							})
+							currentTasksArray.forEach(function(task){
+								task.unit.forEach(function(unitName){
+									if(foundUnit.name === unitName){
+										taskPerUnitArray.push(task);	
+									}
+								})
+							})
+							if(req.user.isManager){
+								res.render("tasks/index", {tasks: taskPerUnitArray, date: now, user: req.user});
+							}
+						} 	
+						client.close();
+					});
+			});
+		}
+	})
 })
 
 //NEW TASK
 app.get("/task/new",isLoggedIn, function(req,res){
-	
 	Unit.find({}, function(err, allUnits){
 		if(err){
 			console.log(err);
@@ -112,42 +193,39 @@ app.get("/task/new",isLoggedIn, function(req,res){
 
 //CREATE TASK
 app.post("/task", function(req,res){
-	
-	var date = req.body.date;
-	var worker = req.body.worker;
-	var unit = req.body.unit;
-	var sidenote = req.body.sidenote;
-	
-	var newTask = {date: date, user: worker, unit: unit, sidenote: sidenote};
-	console.log(req.body);
-	//Create new tasks and adds to DB
-	Task.create(newTask,function(err, newlyCreatedTask){
+	var newTask;
+	User.findById(req.body.user, function(err, foundUser){
 		if(err){
 			console.log(err);
-			
 		}else {
-			console.log(req.body);
-			res.redirect("/task");
+			var assignedWorker = {
+				id: foundUser._id,
+				nickname: foundUser.nickname
+			}
+			newTask = {date: req.body.date, user: assignedWorker, unit: req.body.unit, sidenote: req.body.sidenote};
+			//Create new tasks and adds to DB
+			Task.create(newTask,function(err, newlyCreatedTask){
+				if(err){
+					console.log(err);
+
+				}else {
+					res.redirect("/task");
+				}
+			})
 		}
 	})
 })
 
 //SHOW TASK
 app.get("/task/:id", function(req,res){
-	var toBeShownTask;
-	Task.findById(req.params.id, function(err, foundTask){
+	
+	Task.findById(req.params.id).populate("feedback").exec(function(err, foundTask){
 		if(err){
 			console.log(err);
 		}else {
-			// toBeShownTask = foundTask;
-			// toBeShownTask.date.setHours(0,0,0,0);
-			// console.log("Be4 format toBESHOWNDate "+toBeShownTask.date);
-			// toBeShownTask.date = moment(toBeShownTask.date).format("LLL");
-			// console.log("After format toBESHOWNDate "+toBeShownTask.date);
 			res.render("tasks/show", {task: foundTask, date: now});
 		}
 	})
-	
 })
 
 //EDIT TASK
@@ -180,13 +258,26 @@ app.get("/task/:id/edit", function(req,res){
 
 //UPDATE TASK
 app.put("/task/:id", function(req,res){
-	Task.findByIdAndUpdate(req.params.id, req.body,function(err, updatedTask){
+	
+	User.findById(req.body.user, function(err, foundUser){
 		if(err){
-			res.redirect("/task");
+			console.log(err);
 		}else {
-			res.redirect("/task/"+req.params.id);
+			var assignedWorker = {
+				id: foundUser._id,
+				nickname: foundUser.nickname
+			}
+			var newTask = {date: req.body.date, user: assignedWorker, unit: req.body.unit, sidenote: req.body.sidenote};
+			Task.findByIdAndUpdate(req.params.id, newTask,function(err, updatedTask){
+				if(err){
+					res.redirect("/task");
+				}else {
+					res.redirect("/task/"+req.params.id);
+				}
+			})
 		}
 	})
+	
 })
 
 
@@ -223,10 +314,7 @@ app.get("/unit/new", function(req,res){
 
 //CREATE UNIT
 app.post("/unit", function(req,res){
-	var unitName = req.body.name;
-	var unitImage = req.body.image;
-	var unitTime = req.body.checkinout;
-	var newUnit = {name: unitName,image: unitImage, checkinout: unitTime};
+	var newUnit = {name: req.body.name,image: req.body.image, checkinout: req.body.checkinout};
 	
 	//Create new units and adds to DB
 	Unit.create(newUnit,function(err, newlyCreatedUnit){
@@ -291,9 +379,9 @@ app.get("/register", function(req,res){
 //Create new USER then redirects
 app.post("/register", function(req,res){
 	if(req.body.manager==="on" && req.body.master==="master123"){
-		var newUser = new User({username: req.body.username, isManager: true});
+		var newUser = new User({username: req.body.username,nickname: req.body.nickname, isManager: true});
 	}else {
-		var newUser = new User({username: req.body.username, isManager: false});
+		var newUser = new User({username: req.body.username,nickname: req.body.nickname, isManager: false});
 	}	
 	//Create new user and adds to DB
 	User.register(newUser, req.body.password,function(err,newlyCreatedUser){
@@ -347,14 +435,14 @@ function viewHistory(number,req,res){
 					}		
 				})
 				if(req.user.isManager){
-					res.render("tasks/history", {tasks: newArray, date: now, route: toCurrent});
+					res.render("tasks/history", {tasks: newArray, date: now, route: toCurrent, user: req.user});
 				}else {
 					newArray.forEach(function(task){
-						if(task.user === req.user.username){
+						if(task.user.id.toString() === req.user._id.toString()){
 							taskArray.push(task);
 						}
 					})
-					res.render("tasks/history", {tasks: taskArray, date: now, route: toCurrent});
+					res.render("tasks/history", {tasks: taskArray, date: now, route: toCurrent,user: req.user});
 				}
 			} 	
     		client.close();
@@ -379,12 +467,203 @@ app.get("/history_180",isLoggedIn, function(req,res){
 
 function isLoggedIn(req, res, next){
 	if(req.isAuthenticated()){
-		console.log(req.user);
+		//console.log(req.user);
 		return next();
 	}
 	res.redirect("/");
 }
 
+//SHOW PASSWORD RETRIEVAL
+app.get("/reclaim_password",function(req,res){
+	res.render("reclaimPassword");
+});
+
+//POST PW RETRIEVAL
+app.post("/reclaim_password", function(req,res){
+	var myMail = "celestialrailroad@gmail.com";
+	
+	// host: 'smtp.mailtrap.io',
+	// 				port: 2525,
+	// 				auth: {
+	// 				user: '48aabd7aa3cb7c',
+	// 				pass: '21881e8e51e9d6'
+	
+	User.find({}, function(err,allUsers){
+		allUsers.forEach(function(user){
+			if(user.username===req.body.username){
+				// let transport = nodemailer.createTransport({
+				// 	// service: "gmail",
+				// 	// auth: {
+				// 	// user: 'ngkimnhatnam@gmail.com',
+				// 	// pass: 'Ngkimnhatnam92'
+				// 	// }
+				// 	host: 'smtp.mailtrap.io',
+				// 	port: 2525,
+				// 	auth: {
+				// 	user: '48aabd7aa3cb7c',
+				// 	pass: '21881e8e51e9d6'}
+				// })
+				
+				const Email = require('email-templates');
+
+				const email = new Email({
+
+				  // uncomment below to send emails in development/test env:
+				  send: true,
+				  transport: {
+					host: 'smtp.mailtrap.io',
+					port: 2525,
+					auth: {
+					user: '48aabd7aa3cb7c',
+					pass: '21881e8e51e9d6'}
+				  }
+				});
+
+				email
+				  .send({
+					template: 'resetPass',
+					message: {
+						from: 'myemail@gmail.com',
+						to: 'youremail@gmail.com'
+						
+					},
+					locals: {
+						nickname: user.nickname,
+						link:	'https://piupiu.run-eu-central1.goorm.io/reset_password/'+user._id
+					}
+				  })
+				  .then(console.log)
+				  .catch(console.error);		
+			}
+		})
+	});
+})
+
+//PASSWORD RESET FORM
+app.get("/reset_password/:id", function(req,res){
+	
+	User.findById(req.params.id, function(err, foundUser){
+		if(err){
+			console.log(err);
+		}else {
+			console.log(foundUser);
+			res.render("resetPassword", {user: foundUser});
+		}
+	})
+})
+
+//PASSWORD RESET
+app.put("/reset_password/:id", function(req,res){
+	
+	if(req.body.password !== req.body.retype){
+		res.redirect("/reset_password/"+req.params.id);
+	}else {
+		
+		User.findById(req.params.id,function(err, updatedUser){
+			if(err){
+				console.log(err);
+			}else {
+				updatedUser.setPassword(req.body.password, function(){
+					updatedUser.save();	
+				})
+				res.send("You reset password successfully!");
+			}
+		})	
+	}
+})
+	
+//CHANGE PASSWORD FORM
+app.get("/change_password/:id", function(req,res){
+	
+	User.findById(req.params.id, function(err, foundUser){
+		if(err){
+			console.log(err);
+		}else {
+			console.log(foundUser);
+			res.render("settings/pwchange", {user: foundUser, date: now});
+		}
+	})
+})
+
+//CHANGE PASSWORD UPDATE
+app.put("/change_password/:id", function(req,res){
+	
+	if(req.body.password !== req.body.retype){
+		res.redirect("/change_password/"+req.params.id);
+	}else {
+		
+		User.findById(req.params.id,function(err, updatedUser){
+			if(err){
+				console.log(err);
+			}else {
+				updatedUser.setPassword(req.body.password, function(){
+					updatedUser.save();	
+				})
+				//res.send("You reset password successfully!");
+				res.redirect("/task");
+			}
+		})	
+	}
+})
+
+//SORT OPTION FORM
+app.get("/sort_option", function(req,res){
+	
+	Unit.find({}, function(err, allUnits){
+		if(err){
+			console.log(err);
+		}else {
+			User.find({}, function(err, allUsers){
+				if(err){
+					console.log(err);
+				}else {
+					//console.log(allUsers);
+					res.render("settings/sortoption", {units: allUnits, users: allUsers, date: now});
+				}
+			})
+		}
+	});
+
+})
+
+//FEEDBACK FORM
+app.get("/task/:id/feedback", function(req,res){
+	
+	Task.findById(req.params.id, function(err,foundTask){
+		if(err){
+			console.log(err);
+		}else {
+			res.render("tasks/feedback", {task: foundTask, date: now});
+		}
+	})
+	
+	
+})
+
+//FEEDBACK SUBMIT
+app.post("/task/:id/feedback", function(req,res){
+	Task.findById(req.params.id, function(err,foundTask){
+		if(err){
+			console.log(err);
+		}else {
+			Feedback.create(req.body.feedback, function(err, createdFeedback){
+				if(err){
+					console.log(err);
+				}else {
+					createdFeedback.content = req.body.feedback.text;
+					createdFeedback.author = {
+						id: req.user.id,
+						nickname: req.user.nickname
+					}
+					createdFeedback.save();
+					foundTask.feedback.push(createdFeedback);
+					foundTask.save();
+					res.redirect("/task/"+foundTask._id);
+				}
+			})
+		}
+	})
+})
 
 
 app.listen(3000, function(){

@@ -7,25 +7,31 @@
 			<div class="card text-center" style="width: 40%;margin: auto;">
 				<div class="card-body border-style border border-dark">
 				<h5 class="card-title"><%= task.date.toDateString() %></h5>
-				<h6 class="card-subtitle mb-2 text-muted"><%= task.user %></h6>
+				<h6 class="card-subtitle mb-2 text-muted"><%= task.user.nickname %></h6>
 				<p class="card-text">Following assigned units:</p> 
 					<ul style="list-style: none;">
 						<% task.unit.forEach(function(name){ %>
 							<li><%=name%></li>
 						<% }) %>
 					</ul>					
-					<p class="card-text">
-						Sidenote: <%= task.sidenote %>
-					</p>
-					<% if(currentUser&&currentUser.isManager){%>
-					<a href="/task/<%=task._id%>/edit" class="btn btn-warning">Edit</a>
-					<% } %>
+				<p class="card-text">
+					Sidenote: <%= task.sidenote %>
+				</p>
+				<p class="card-text">
+					Feedback:<br>
+					<% task.feedback.forEach(function(feedback){ %>
+					<%= feedback.content %> - "<%= feedback.author.nickname %>" -
+					<br>
+					<% }) %>
+					
+				</p>
+				<% if(currentUser&&currentUser.isManager){%>
+					<a href="/task/<%=task._id%>/edit" class="btn btn-warning">Edit task</a>
+				<% } %>
+				<a href="/task/<%=task._id%>/feedback" class="btn btn-success">Add feedback</a>
 				</div>
 			</div>
 		</div>
 		<a class="row" style="justify-content: center;" href="/task">Back to allocated tasks</a>
 	</div>
-
-
-
 <%- include("../partials/footer") %>

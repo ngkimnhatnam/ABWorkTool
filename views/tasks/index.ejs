@@ -11,7 +11,13 @@
 					<% } %>
 					<a class="nav-link" href="/unit">View Units</a>
 					<a class="nav-link" href="/history"> View History</a>
-				  	<a class="nav-link" id="v-pills-settings-tab" data-toggle="pill" href="#v-pills-settings" role="tab" aria-controls="v-pills-settings" aria-selected="false">Settings</a>
+				  	<a class="nav-link" data-toggle="collapse" href="#collapseSetting" aria-expanded="true" aria-controls="collapseSetting">Settings</a>
+					<div class="collapse" id="collapseSetting">
+						<ul class="list-group list-group-flush">
+							<li class="list-group-item list-group-item-action"><a class="nav-link" href="/change_password/<%=user._id%>">Change password</a></li>
+							<li class="list-group-item list-group-item-action"><a class="nav-link" href="/sort_option">Sorting options</a></li>
+						</ul>
+					</div>
 				</div>
 			</div>
 			<div class="col-9">
@@ -25,7 +31,7 @@
 										<div class="card-body border border-style border-success">
 									<% } %>
 									<h5 class="card-title"><%=task.date%></h5>
-									<p class="card-text" style="font-size: 1.5em;"><strong><%=task.user%></strong> </p>
+									<p class="card-text" style="font-size: 1.5em;"><strong><%=task.user.nickname%></strong> </p>
 									<p class="card-text"><%=task.unit%></p>
 									<a href="/task/<%=task._id%>" class="btn btn-primary">View</a>
 									<% if(currentUser&&currentUser.isManager){%>
