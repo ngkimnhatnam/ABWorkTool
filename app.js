@@ -1,22 +1,23 @@
-var express 		= require("express"),
-	bodyParser 		= require("body-parser"),
-	mongoose		= require("mongoose"),
-	passport		= require("passport"),
-	localStrategy	= require("passport-local"),
-	User			= require("./models/user"),
-	Unit			= require("./models/unit"),
-	Task			= require("./models/task"),
-	Feedback		= require("./models/feedback"),
-	methodOverride	= require("method-override"),
-	moment			= require("moment"),
-	nodemailer		= require("nodemailer"),
-	app 			= express();
+var express 			= require("express"),
+	bodyParser 			= require("body-parser"),
+	mongoose			= require("mongoose"),
+	passport			= require("passport"),
+	localStrategy		= require("passport-local"),
+	User				= require("./models/user"),
+	Unit				= require("./models/unit"),
+	Task				= require("./models/task"),
+	Feedback			= require("./models/feedback"),
+	methodOverride		= require("method-override"),
+	moment				= require("moment"),
+	nodemailer			= require("nodemailer"),
+	flash				= require("connect-flash"),
+	app 				= express();
 	
 
 var thisMoment = new Date();
 thisMoment.setHours(0,0,0,0);
 var minDate = moment().format("YYYY-MM-DD");
-var now = moment().format("ddd DD MMM YYYY");
+var displayTime = moment().format("ddd DD MMM YYYY");
  
 var mongoClient = require('mongodb').MongoClient;  
 var url = "mongodb://localhost";  
@@ -28,6 +29,8 @@ mongoose.connect("mongodb://localhost/airbnb",{ useNewUrlParser: true, useUnifie
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine","ejs");
 app.use(methodOverride("_method"));
+app.use(express.static(__dirname + "/public"));
+app.use(flash());
 
 //PASSPORT CONFIGURATION
 app.use(require("express-session")({
@@ -46,6 +49,8 @@ passport.deserializeUser(User.deserializeUser());
 //if user is empty or logged in, then next() proceeds to following route call
 app.use(function(req,res,next){
 	res.locals.currentUser = req.user;
+	res.locals.error		= req.flash("error");
+	res.locals.success		= req.flash("success");
 	next();
 });
 
@@ -75,14 +80,15 @@ app.get("/task",isLoggedIn, function(req,res){
 						}		
 					})
 					if(req.user.isManager){
-						res.render("tasks/index", {tasks: newArray, date: now, user: req.user});
+						
+						res.render("tasks/index", {tasks: newArray, date: displayTime, user: req.user});
 					}else {
 						newArray.forEach(function(task){
-							if(task.user.id.toString() === req.user._id.toString()){
+							if(task.user.id === req.user._id.toString()){
 								taskArray.push(task);
 							}
 						})
-						res.render("tasks/index", {tasks: taskArray, date: now,user: req.user});
+						res.render("tasks/index", {tasks: taskArray, date: displayTime,user: req.user});
 					}
 				} 	
 				//console.log(result);
@@ -121,7 +127,7 @@ app.get("/sort_option/user/:id", function(req,res){
 								}
 							})
 							if(req.user.isManager){
-								res.render("tasks/index", {tasks: taskPerUserArray, date: now, user: req.user});
+								res.render("tasks/index", {tasks: taskPerUserArray, date: displayTime, user: req.user});
 							}
 						} 	
 						client.close();
@@ -163,7 +169,7 @@ app.get("/sort_option/unit/:id", function(req,res){
 								})
 							})
 							if(req.user.isManager){
-								res.render("tasks/index", {tasks: taskPerUnitArray, date: now, user: req.user});
+								res.render("tasks/index", {tasks: taskPerUnitArray, date: displayTime, user: req.user});
 							}
 						} 	
 						client.close();
@@ -184,7 +190,7 @@ app.get("/task/new",isLoggedIn, function(req,res){
 					console.log(err);
 				}else {
 					//console.log(allUsers);
-					res.render("tasks/new", {units: allUnits, users: allUsers, date: now, thisMoment: minDate});
+					res.render("tasks/new", {units: allUnits, users: allUsers, date: displayTime, thisMoment: minDate});
 				}
 			})
 		}
@@ -193,7 +199,7 @@ app.get("/task/new",isLoggedIn, function(req,res){
 
 //CREATE TASK
 app.post("/task", function(req,res){
-	var newTask;
+	
 	User.findById(req.body.user, function(err, foundUser){
 		if(err){
 			console.log(err);
@@ -202,13 +208,32 @@ app.post("/task", function(req,res){
 				id: foundUser._id,
 				nickname: foundUser.nickname
 			}
-			newTask = {date: req.body.date, user: assignedWorker, unit: req.body.unit, sidenote: req.body.sidenote};
+			//This prepares an array with units and status before creating a task
+			var newUnit = [];
+			if(typeof req.body.unit !== "string"){
+				req.body.unit.forEach(function(unit){
+						var assignedUnit = {
+							name: unit,
+							status: "Not started"
+						}
+					newUnit.push(assignedUnit);
+				})
+			}else {
+				var assignedUnit = {
+							name: req.body.unit,
+							status: "Not started"
+						}
+				newUnit.push(assignedUnit);
+			}
+			var newTask = {date: req.body.date, user: assignedWorker, unit: newUnit, sidenote: req.body.sidenote};
+			
 			//Create new tasks and adds to DB
 			Task.create(newTask,function(err, newlyCreatedTask){
 				if(err){
+					req.flash("error", "Unable to create task");
 					console.log(err);
-
 				}else {
+					req.flash("success", "Task created");
 					res.redirect("/task");
 				}
 			})
@@ -223,7 +248,7 @@ app.get("/task/:id", function(req,res){
 		if(err){
 			console.log(err);
 		}else {
-			res.render("tasks/show", {task: foundTask, date: now});
+			res.render("tasks/show", {task: foundTask, date: displayTime, dateNow: thisMoment});
 		}
 	})
 })
@@ -251,7 +276,7 @@ app.get("/task/:id/edit", function(req,res){
 			console.log(err);
 		}else {
 			console.log(foundTask);
-			res.render("tasks/edit", {task: foundTask, units: unitList, users: userList, date: now, thisMoment: minDate});
+			res.render("tasks/edit", {task: foundTask, units: unitList, users: userList, date: displayTime, thisMoment: minDate});
 		}
 	})
 })
@@ -270,6 +295,56 @@ app.put("/task/:id", function(req,res){
 			var newTask = {date: req.body.date, user: assignedWorker, unit: req.body.unit, sidenote: req.body.sidenote};
 			Task.findByIdAndUpdate(req.params.id, newTask,function(err, updatedTask){
 				if(err){
+					req.flash("error", "Error updating task");
+					res.redirect("/task");
+				}else {
+					req.flash("success", "Task updated");
+					res.redirect("/task/"+req.params.id);
+				}
+			})
+		}
+	})
+})
+
+//UPDATE TASK STATUS
+app.put("/task/:id/status", function(req,res){
+	
+	Task.findById(req.params.id, function(err, foundTask){
+		if(err){
+			console.log(err);
+		}else {
+			var newTask;
+			var newUnitArray = [];
+			foundTask.unit.forEach(function(unit){
+				if(unit._id.toString() === req.body.nextTaskStatus.toString()){
+					if(unit.status ==="Not started"){
+						var newUnitStatus = "In progress";
+					}
+					if(unit.status ==="In progress"){
+						var newUnitStatus = "Cleaning done";
+					}
+					if(unit.status ==="Cleaning done"){
+						var newUnitStatus = "All done";
+					}
+					var newUnit = {
+						_id: unit._id,
+						name: unit.name,
+						status: newUnitStatus
+					}
+					newUnitArray.push(newUnit);
+					
+				}else {
+					newUnitArray.push(unit);
+				}
+				var newUser = {
+						id: foundTask.user.id,
+						nickname: foundTask.user.nickname
+					}
+				console.log("newUnitArray here.. "+newUnitArray);
+				newTask = {date: req.body.date, user: newUser, unit: newUnitArray, sidenote: req.body.sidenote};
+			})
+			Task.findByIdAndUpdate(req.params.id, newTask,function(err, updatedTask){
+				if(err){
 					res.redirect("/task");
 				}else {
 					res.redirect("/task/"+req.params.id);
@@ -277,7 +352,6 @@ app.put("/task/:id", function(req,res){
 			})
 		}
 	})
-	
 })
 
 
@@ -287,6 +361,7 @@ app.delete("/task/:id", function(req,res){
 		if(err){
 			console.log(err);
 		}else {
+			req.flash("success", "Task deleted");
 			res.redirect("/task");
 		}
 	})
@@ -302,14 +377,14 @@ app.get("/unit",isLoggedIn, function(req,res){
 		if(err){
 			console.log(err);
 		}else {
-			res.render("units/", {units: allUnits, date: now, route: toUnit});
+			res.render("units/", {units: allUnits, date: displayTime, route: toUnit});
 		}
 	});
 })
 
 //NEW UNIT
 app.get("/unit/new", function(req,res){
-	res.render("units/new", {date: now});
+	res.render("units/new", {date: displayTime});
 })
 
 //CREATE UNIT
@@ -322,6 +397,7 @@ app.post("/unit", function(req,res){
 			console.log(err);
 			
 		}else {
+			req.flash("success", "Unit created");
 			res.redirect("/unit");
 		}
 	})
@@ -333,7 +409,7 @@ app.get("/unit/:id", function(req,res){
 		if(err){
 			console.log(err);
 		}else {
-			res.render("units/show", {unit: foundUnit, date: now});
+			res.render("units/show", {unit: foundUnit, date: displayTime});
 		}
 	})
 })
@@ -344,7 +420,7 @@ app.get("/unit/:id/edit", function(req,res){
 		if(err){
 			console.log(err);
 		}else {
-			res.render("units/edit", {unit: foundUnit, date: now});
+			res.render("units/edit", {unit: foundUnit, date: displayTime});
 		}
 	})
 })
@@ -355,6 +431,7 @@ app.put("/unit/:id",function(req,res){
 		if(err){
 			res.redirect("/unit");
 		}else {
+			req.flash("success", "Unit updated");
 			res.redirect("/unit/"+req.params.id);
 		}
 	})
@@ -366,6 +443,7 @@ app.delete("/unit/:id", function(req,res){
 		if(err){
 			console.log(err);
 		}else {
+			req.flash("success", "Unit deleted");
 			res.redirect("/unit");
 		}
 	})
@@ -390,8 +468,52 @@ app.post("/register", function(req,res){
 			return res.render("/register");
 		}
 		passport.authenticate("local")(req,res,function(){
-			res.redirect("/task");
+			req.flash("success", "Account successfully created");
+			res.redirect("/");
 		})
+
+		// let transport = nodemailer.createTransport({
+		// 	// service: "gmail",
+		// 	// auth: {
+		// 	// user: 'ngkimnhatnam@gmail.com',
+		// 	// pass: 'Ngkimnhatnam92'
+		// 	// }
+		// 	host: 'smtp.mailtrap.io',
+		// 	port: 2525,
+		// 	auth: {
+		// 	user: '48aabd7aa3cb7c',
+		// 	pass: '21881e8e51e9d6'}
+		// })
+
+		const Email = require('email-templates');
+		const email = new Email({
+			// uncomment below to send emails in development/test env:
+			send: true,
+			transport: {
+				host: 'smtp.mailtrap.io',
+				port: 2525,
+				auth: {
+				user: '48aabd7aa3cb7c',
+				pass: '21881e8e51e9d6'}
+			}
+		});
+
+		email
+		.send({
+		template: 'accountCreation',
+		message: {
+			from: 'account@airbnbtool.com',
+			to: req.body.username
+		},
+			locals: {
+				username: req.body.username,
+				nickname: req.body.nickname,
+				password: req.body.password,
+				link:	'https://piupiu.run-eu-central1.goorm.io/'
+			}
+		})
+		.then(console.log)
+		.catch(console.error);			
 	});
 })
 
@@ -402,6 +524,7 @@ app.post("/login", passport.authenticate("local",
 	failureRedirect: "/"
 	}),
 	function(req,res){
+		
 })	
 
 //logout route
@@ -435,14 +558,14 @@ function viewHistory(number,req,res){
 					}		
 				})
 				if(req.user.isManager){
-					res.render("tasks/history", {tasks: newArray, date: now, route: toCurrent, user: req.user});
+					res.render("tasks/history", {tasks: newArray, date: displayTime, route: toCurrent, user: req.user, dateNow: thisMoment});
 				}else {
 					newArray.forEach(function(task){
 						if(task.user.id.toString() === req.user._id.toString()){
 							taskArray.push(task);
 						}
 					})
-					res.render("tasks/history", {tasks: taskArray, date: now, route: toCurrent,user: req.user});
+					res.render("tasks/history", {tasks: taskArray, date: displayTime, route: toCurrent,user: req.user, dateNow: thisMoment});
 				}
 			} 	
     		client.close();
@@ -467,7 +590,6 @@ app.get("/history_180",isLoggedIn, function(req,res){
 
 function isLoggedIn(req, res, next){
 	if(req.isAuthenticated()){
-		//console.log(req.user);
 		return next();
 	}
 	res.redirect("/");
@@ -481,12 +603,6 @@ app.get("/reclaim_password",function(req,res){
 //POST PW RETRIEVAL
 app.post("/reclaim_password", function(req,res){
 	var myMail = "celestialrailroad@gmail.com";
-	
-	// host: 'smtp.mailtrap.io',
-	// 				port: 2525,
-	// 				auth: {
-	// 				user: '48aabd7aa3cb7c',
-	// 				pass: '21881e8e51e9d6'
 	
 	User.find({}, function(err,allUsers){
 		allUsers.forEach(function(user){
@@ -505,7 +621,6 @@ app.post("/reclaim_password", function(req,res){
 				// })
 				
 				const Email = require('email-templates');
-
 				const email = new Email({
 
 				  // uncomment below to send emails in development/test env:
@@ -566,7 +681,7 @@ app.put("/reset_password/:id", function(req,res){
 				updatedUser.setPassword(req.body.password, function(){
 					updatedUser.save();	
 				})
-				res.send("You reset password successfully!");
+				req.flash("success","You reset password successfully!");
 			}
 		})	
 	}
@@ -580,7 +695,7 @@ app.get("/change_password/:id", function(req,res){
 			console.log(err);
 		}else {
 			console.log(foundUser);
-			res.render("settings/pwchange", {user: foundUser, date: now});
+			res.render("settings/pwchange", {user: foundUser, date: displayTime});
 		}
 	})
 })
@@ -599,7 +714,7 @@ app.put("/change_password/:id", function(req,res){
 				updatedUser.setPassword(req.body.password, function(){
 					updatedUser.save();	
 				})
-				//res.send("You reset password successfully!");
+				req.flash("success", "Password changed successfully");
 				res.redirect("/task");
 			}
 		})	
@@ -618,7 +733,7 @@ app.get("/sort_option", function(req,res){
 					console.log(err);
 				}else {
 					//console.log(allUsers);
-					res.render("settings/sortoption", {units: allUnits, users: allUsers, date: now});
+					res.render("settings/sortoption", {units: allUnits, users: allUsers, date: displayTime});
 				}
 			})
 		}
@@ -633,7 +748,7 @@ app.get("/task/:id/feedback", function(req,res){
 		if(err){
 			console.log(err);
 		}else {
-			res.render("tasks/feedback", {task: foundTask, date: now});
+			res.render("tasks/feedback", {task: foundTask, date: displayTime});
 		}
 	})
 	
@@ -658,6 +773,7 @@ app.post("/task/:id/feedback", function(req,res){
 					createdFeedback.save();
 					foundTask.feedback.push(createdFeedback);
 					foundTask.save();
+					req.flash("success", "Feedback submitted");
 					res.redirect("/task/"+foundTask._id);
 				}
 			})

@@ -38,7 +38,11 @@
 								<div class="card-body">
 									<h5 class="card-title"><%=task.date%></h5>
 									<p class="card-text" style="font-size: 1.5em;"><strong><%=task.user.nickname%></strong> </p>
-									<p class="card-text"><%=task.unit%></p>
+									<ul>
+										<% task.unit.forEach(function(unit){ %>
+										<li><%=unit.name%> - <%=unit.status%></li>
+										<% }) %>
+									</ul>
 									<a href="/task/<%=task._id%>" class="btn btn-primary">View</a>
 									<% if(currentUser&&currentUser.isManager){%>
 									<form action="/task/<%=task._id%>?_method=delete" method="POST" style="display: inline;">

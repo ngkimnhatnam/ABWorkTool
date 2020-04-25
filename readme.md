@@ -18,11 +18,10 @@
 * Master account created via master code
 * Password retrieval via email & password change
 * Feedback functionality from users
-
-#TO BE DONE
-* Randomize password when creating sub accs
-* Flash messages
 * Notification systems to master account of completed task
+* Randomize password when creating sub accs && send confirmation mail
+* Flash messages
+#TO BE DONE
 * Adjust layout, font, color, background
 * Refractor codes
 

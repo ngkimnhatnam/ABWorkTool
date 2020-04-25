@@ -8,7 +8,10 @@ var taskSchema	=	mongoose.Schema({
 	},
 	//user: String,
 	unit: [
-		
+		{
+			name: String,
+			status: String
+		}
 	],
 	feedback: [
 		{

@@ -9,11 +9,41 @@
 				<h5 class="card-title"><%= task.date.toDateString() %></h5>
 				<h6 class="card-subtitle mb-2 text-muted"><%= task.user.nickname %></h6>
 				<p class="card-text">Following assigned units:</p> 
-					<ul style="list-style: none;">
+					<form action="/task/<%=task._id%>/status?_method=PUT" method="POST">
+						<input name="date" value="<%=task.date%>" hidden>
+						<input name="user" value="<%=task.user%>" hidden>
+						<input name="unit" value="<%=task.unit%>" hidden>
+						<input name="sidenote" value="<%=task.sidenote%>" hidden>
+						
+						<ul style="list-style: none;">
+						
 						<% task.unit.forEach(function(name){ %>
-							<li><%=name%></li>
+							<% if(name.status === "Not started"){ %>
+								<li><%=name.name%> - <%=name.status%>
+								<% if(currentUser&&currentUser.isManager === false&&task.date.getTime()>dateNow.getTime()){%>
+									<button class="btn btn-secondary" name="nextTaskStatus" type="submit" value="<%=name._id%>">Start</button>
+									<% } %>
+								</li>
+								<% } %>
+							<% if(name.status === "In progress"){ %>
+								<li><%=name.name%> - <%=name.status%>
+								<% if(currentUser&&currentUser.isManager === false&&task.date.getTime()>dateNow.getTime()){%>
+								<button class="btn btn-secondary" name="nextTaskStatus" type="submit" value="<%=name._id%>">Finish</button><% } %>
+								</li>
+								<% } %>
+							<% if(name.status === "Cleaning done"){ %>
+								<li><%=name.name%> - <%=name.status%>
+								<% if(currentUser&&currentUser.isManager === false&&task.date.getTime()>dateNow.getTime()){%>
+								<button class="btn btn-secondary" name="nextTaskStatus" type="submit" value="<%=name._id%>">Send keys</button><% } %>
+								</li>
+							<% } %>
+							<% if(name.status === "All done"){ %>
+								<li><%=name.name%> - <%=name.status%></li>
+							<% } %>
 						<% }) %>
-					</ul>					
+						</ul>
+					</form>
+										
 				<p class="card-text">
 					Sidenote: <%= task.sidenote %>
 				</p>

@@ -1,31 +1,33 @@
-
-
-<div class="container">
-	<div class="row">
-		<div style="width: 30%; margin: 25px auto;">
-			<h1 style="text-align: center">
-				Welcome to AirBnb Work Tool
-			</h1>
-			<form action="/login" method="POST">
-				<div class="form-group">
-					<input class="form-control" type="text" name="username" placeholder="Your username" required>
-				</div>
-				<div class="form-group">
-					<input class="form-control" type="password" name="password" placeholder="Password" required>
-				</div>
-				<div class="form-group">
-					<button class="btn btn-lg btn-primary btn-block">Login</button>
-				</div>
-				<div class="form-group">
-					<a href="/reclaim_password" class="btn btn-lg btn-primary btn-block">Forgot password?</a>
-				</div>
-				<div>
-						<a class="btn btn-lg btn-primary btn-block" href="/register">Register</a>
-				</div>
-		</form>
-		</div>
-		
-		
-	</div>
+<!DOCTYPE html>
+<html>
+	<head>
+		<!-- Required meta tags -->
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<title>AirBnb WorkTool</title>
+		<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+		<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+		<link rel="stylesheet" type="text/css" href="/stylesheets/landing.css">
 	
-</div>
+	</head>
+	<body>
+			<div id="landing-header">
+				<h1>Welcome to AirBnb Work Tool</h1>
+				<form action="/login" method="POST">
+					<div class="form-group">
+						<input class="form-control" type="text" name="username" placeholder="Username" required>
+					</div>
+					<div class="form-group">
+						<input class="form-control" type="password" name="password" placeholder="Password" required>
+					</div>
+					<div class="form-group">
+						<button class="btn btn-sm btn-block" id="buttons">Login</button>
+					</div>
+					<div class="form-group">
+						<a href="/reclaim_password" class="btn btn-sm  btn-block" id="buttons">Forgot password?</a>
+					</div>
+			</form>
+			</div>
+	</body>
+</html>
