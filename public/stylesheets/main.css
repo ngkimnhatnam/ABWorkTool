@@ -2,11 +2,29 @@
 
 
 
+.stickyNavButtons {
+	position: -webkit- sticky;
+	position: sticky;
+	top: 0;
+}
+
+
+#viewandDeleteButton {
+	padding: 0;
+}
+
+#taskCardBody {
+	height: 300px;
+}
 
 
 
-
-
+#taskListInTaskCard {
+	list-style: none;
+	text-align: justify;
+	
+	padding: 0 10px 0 15px;
+}
 
 #mainViewContainer {
 	padding: 0;
@@ -14,7 +32,7 @@
 
 #borderOnTaskCard {
 	border-width: 4px !important;
-			
+	padding-bottom: 5px;
 }
 
 #taskDeleteButton {

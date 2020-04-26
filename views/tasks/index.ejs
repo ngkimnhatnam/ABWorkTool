@@ -4,8 +4,8 @@
 	</header>
 	<div class="container" id="mainViewContainer">
 		<div class="row">
-			<div class="col-3 col-sm-2">
-				<div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+			<div class="col-3 col-sm-2" >
+				<div class="nav flex-column nav-pills stickyNavButtons" id="v-pills-tab" role="tablist" aria-orientation="vertical">
 					<% if(currentUser&&currentUser.isManager){%>
 					<a class="nav-link" href="/task/new">Add new task</a>
 					<% } %>
@@ -21,40 +21,49 @@
 				</div>
 			</div>
 			<div class="col-9 col-sm-10">	
-				<!-- <% tasks.forEach(function(task){ %>
-				<div class="col-md-6 col-lg-4" style="margin-bottom: 20px;">
-					<div class="card h-100 text-center">
-						<% if(task.date == date){ %>
-							<div class="card-body border border-warning" id="borderOnTaskCard">
-						<% } else {%>
-							<div class="card-body border border-success" id="borderOnTaskCard">
-						<% } %>
-						<h5 class="card-title"><%=task.date%></h5>
-						<p class="card-text" id="nicknameOnTask"><strong><%=task.user.nickname%></strong> </p>
-						<ul>
-							<% task.unit.forEach(function(unit){ %>
-								<li><%=unit.name%> - <%=unit.status%></li><br>
-							<% }) %>
-						</ul>
-						<a href="/task/<%=task._id%>" class="btn btn-primary">View</a>
-							<% if(currentUser&&currentUser.isManager){%>
-								<form action="/task/<%=task._id%>?_method=delete" method="POST" id="taskDeleteButton">
-									<button class="btn btn-danger">Delete</button>
-								</form>
+				<div class="row">
+					<% tasks.forEach(function(task){ %>
+					<div class="col-md-6 col-lg-4" style="margin-bottom: 20px;">
+						<div class="card text-center" id="taskCardBody">
+							<% if(task.date == date){ %>
+								<div class="card-body border border-warning" id="borderOnTaskCard">
+							<% } else {%>
+								<div class="card-body border border-success" id="borderOnTaskCard">
 							<% } %>
+							<h5 class="card-title"><%=task.date%></h5>
+							<p class="card-text" id="nicknameOnTask"><strong><%=task.user.nickname%></strong> </p>
+									<ul id="taskListInTaskCard">
+										<% for(var i=0;i<task.unit.length;i++){ %>
+											<li><%=task.unit[i].name%> - <%=task.unit[i].status%></li>
+											<% if(i>=2){ %>
+											<li> See more + </li>
+											<% break; %>
+											<% } %>
+											<% i++ %>
+										<% } %>
+									</ul>
+							
 							</div>
+							<div class="container">
+								
+								<div class="row">
+									<div class="col" id="viewandDeleteButton">
+										<a href="/task/<%=task._id%>" class="btn btn-primary btn-block">View</a>
+									</div>
+									<% if(currentUser&&currentUser.isManager){%>
+										<div class="col" id="viewandDeleteButton">
+											<form action="/task/<%=task._id%>?_method=delete" method="POST" id="taskDeleteButton">
+											<button class="btn btn-danger btn-block" id="view_deleteButtonsInTaskCard2">Delete</button>
+										</form>
+										</div>	
+									<% } %>
+								</div>	
 							</div>
-					</div>	
-				<% }) %>
-				</div> -->
+						</div>
+						</div>
+					<% }) %>
+				</div>
 				
-				<% tasks.forEach(function(task){ %>
-					<div class="card h-100 text-center">
-						<h5 class="card-title"><%=task.date%></h5>
-						<p class="card-text" id="nicknameOnTask"><strong><%=task.user.nickname%></strong> </p>
-						<a href="/task/<%=task._id%>" class="btn btn-primary">View</a>
-					</div>
-				<% }) %>
 			</div>
 		</div>
 	</div>
