@@ -1,0 +1,408 @@
+var express 			= require("express");
+var router 				= express.Router();
+var passport			= require("passport");
+var nodemailer			= require("nodemailer");
+var moment				= require("moment");
+var mongoClient 		= require('mongodb').MongoClient; 
+var displayTime 		= moment().format("ddd DD MMM YYYY");
+var Unit				= require("../models/unit");
+var Task 				= require("../models/task");
+var User				= require("../models/user");
+var Feedback			= require("../models/feedback");
+var url 				= "mongodb://localhost";  
+var dbName 				= "airbnb";
+var thisMoment 			= new Date();
+thisMoment.setHours(0,0,0,0);
+var minDate 			= moment().format("YYYY-MM-DD");
+var middleware			= require("../middleware/index");
+
+//Landing page
+router.get("/", function(req,res){
+	res.render("landing");
+})
+
+//===========
+//AUTH ROUTES
+//===========
+
+//To REGISTER route
+router.get("/register", function(req,res){
+	res.render("register");
+})
+
+//Create new USER then redirects
+router.post("/register", function(req,res){
+	if(req.body.manager==="on" && req.body.master==="master123"){
+		var newUser = new User({username: req.body.username,nickname: req.body.nickname, isManager: true});
+	}else {
+		var newUser = new User({username: req.body.username,nickname: req.body.nickname, isManager: false});
+	}	
+	//Create new user and adds to DB
+	User.register(newUser, req.body.password,function(err,newlyCreatedUser){
+		if(err){
+			console.log(err);
+			return res.render("/register");
+		}
+		passport.authenticate("local")(req,res,function(){
+			req.flash("success", "Account successfully created");
+			res.redirect("/");
+		})
+
+		// let transport = nodemailer.createTransport({
+		// 	// service: "gmail",
+		// 	// auth: {
+		// 	// user: 'ngkimnhatnam@gmail.com',
+		// 	// pass: 'Ngkimnhatnam92'
+		// 	// }
+		// 	host: 'smtp.mailtrap.io',
+		// 	port: 2525,
+		// 	auth: {
+		// 	user: '48aabd7aa3cb7c',
+		// 	pass: '21881e8e51e9d6'}
+		// })
+
+		const Email = require('email-templates');
+		const email = new Email({
+			// uncomment below to send emails in development/test env:
+			send: true,
+			transport: {
+				host: 'smtp.mailtrap.io',
+				port: 2525,
+				auth: {
+				user: '48aabd7aa3cb7c',
+				pass: '21881e8e51e9d6'}
+			}
+		});
+
+		email
+		.send({
+		template: 'accountCreation',
+		message: {
+			from: 'account@airbnbtool.com',
+			to: req.body.username
+		},
+			locals: {
+				username: req.body.username,
+				nickname: req.body.nickname,
+				password: req.body.password,
+				link:	'https://piupiu.run-eu-central1.goorm.io/'
+			}
+		})
+		.then(console.log)
+		.catch(console.error);			
+	});
+})
+
+//This route handles login
+router.post("/login", passport.authenticate("local", 
+	{
+	successRedirect: "/task",
+	failureRedirect: "/"
+	}),
+	function(req,res){
+		
+})	
+
+//logout route
+router.get("/logout", function(req,res){
+	req.logout();
+	res.redirect("/");
+})
+
+//========================
+//PASSWORD RELATED ROUTES
+//========================
+
+//SHOW PASSWORD RETRIEVAL
+router.get("/reclaim_password",function(req,res){
+	res.render("reclaimPassword");
+});
+
+//POST PW RETRIEVAL
+router.post("/reclaim_password", function(req,res){
+	var myMail = "celestialrailroad@gmail.com";
+	
+	User.find({}, function(err,allUsers){
+		allUsers.forEach(function(user){
+			if(user.username===req.body.username){
+				// let transport = nodemailer.createTransport({
+				// 	// service: "gmail",
+				// 	// auth: {
+				// 	// user: 'ngkimnhatnam@gmail.com',
+				// 	// pass: 'Ngkimnhatnam92'
+				// 	// }
+				// 	host: 'smtp.mailtrap.io',
+				// 	port: 2525,
+				// 	auth: {
+				// 	user: '48aabd7aa3cb7c',
+				// 	pass: '21881e8e51e9d6'}
+				// })
+				
+				const Email = require('email-templates');
+				const email = new Email({
+
+				  // uncomment below to send emails in development/test env:
+				  send: true,
+				  transport: {
+					host: 'smtp.mailtrap.io',
+					port: 2525,
+					auth: {
+					user: '48aabd7aa3cb7c',
+					pass: '21881e8e51e9d6'}
+				  }
+				});
+
+				email
+				  .send({
+					template: 'resetPass',
+					message: {
+						from: 'myemail@gmail.com',
+						to: 'youremail@gmail.com'
+						
+					},
+					locals: {
+						nickname: user.nickname,
+						link:	'https://piupiu.run-eu-central1.goorm.io/reset_password/'+user._id
+					}
+				  })
+				  .then(console.log)
+				  .catch(console.error);		
+			}
+		})
+	});
+})
+
+//PASSWORD RESET FORM
+router.get("/reset_password/:id", function(req,res){
+	
+	User.findById(req.params.id, function(err, foundUser){
+		if(err){
+			console.log(err);
+		}else {
+			console.log(foundUser);
+			res.render("resetPassword", {user: foundUser});
+		}
+	})
+})
+
+//PASSWORD RESET
+router.put("/reset_password/:id", function(req,res){
+	
+	if(req.body.password !== req.body.retype){
+		res.redirect("/reset_password/"+req.params.id);
+	}else {
+		
+		User.findById(req.params.id,function(err, updatedUser){
+			if(err){
+				console.log(err);
+			}else {
+				updatedUser.setPassword(req.body.password, function(){
+					updatedUser.save();	
+				})
+				req.flash("success","You reset password successfully!");
+			}
+		})	
+	}
+})
+	
+//CHANGE PASSWORD FORM
+router.get("/change_password/:id", function(req,res){
+	
+	User.findById(req.params.id, function(err, foundUser){
+		if(err){
+			console.log(err);
+		}else {
+			console.log(foundUser);
+			res.render("settings/pwchange", {user: foundUser, date: displayTime});
+		}
+	})
+})
+
+//CHANGE PASSWORD UPDATE
+router.put("/change_password/:id", function(req,res){
+	
+	if(req.body.password !== req.body.retype){
+		res.redirect("/change_password/"+req.params.id);
+	}else {
+		
+		User.findById(req.params.id,function(err, updatedUser){
+			if(err){
+				console.log(err);
+			}else {
+				updatedUser.setPassword(req.body.password, function(){
+					updatedUser.save();	
+				})
+				req.flash("success", "Password changed successfully");
+				res.redirect("/task");
+			}
+		})	
+	}
+})
+
+//====================
+//SORTING ROUTES
+//====================
+
+//SORT OPTION FORM
+router.get("/sort_option",middleware.isLoggedIn, function(req,res){
+	
+	Unit.find({}, function(err, allUnits){
+		if(err){
+			console.log(err);
+		}else {
+			User.find({}, function(err, allUsers){
+				if(err){
+					console.log(err);
+				}else {
+					//console.log(allUsers);
+					res.render("settings/sortoption", {units: allUnits, users: allUsers, date: displayTime});
+				}
+			})
+		}
+	});
+
+})
+
+//SORT OPTION USER
+router.get("/sort_option/user/:id",middleware.isLoggedIn, function(req,res){
+	
+	var currentTasksArray = [];
+	var taskPerUserArray = [];
+	
+	User.findById(req.params.id, function(err,foundUser){
+		if(err){
+			console.log(err);
+		}else {
+			mongoClient.connect(url, function(err, client) {  
+				if(err){throw err;}
+				var db	= client.db(dbName);
+					var mysort = { date: 1 };	db.collection("tasks").find().sort(mysort).toArray(function(err, result){
+						if (err){
+							throw err;
+						}else {
+							result.forEach(function(task){
+								task.date.setHours(0,0,0,0);
+								if(task.date.getTime()>= thisMoment.getTime()){
+									task.date = moment(task.date).format("ddd DD MMM YYYY");
+									currentTasksArray.push(task);
+								}								
+							})
+							currentTasksArray.forEach(function(task){
+								if(foundUser._id.toString() === task.user.id.toString()){
+									taskPerUserArray.push(task);	
+								}
+							})
+							if(req.user.isManager){
+								res.render("tasks/index", {tasks: taskPerUserArray, date: displayTime, user: req.user});
+							}
+						} 	
+						client.close();
+					});
+			});
+		}
+	})
+})
+
+//SORT OPTION UNIT
+router.get("/sort_option/unit/:id",middleware.isLoggedIn, function(req,res){
+	var currentTasksArray = [];
+	var taskPerUnitArray = [];
+	
+	Unit.findById(req.params.id, function(err,foundUnit){
+		if(err){
+			console.log(err);
+		}else {
+			mongoClient.connect(url, function(err, client) {  
+				if(err){throw err;}
+				var db	= client.db(dbName);
+					var mysort = { date: 1 };
+					db.collection("tasks").find().sort(mysort).toArray(function(err, result){
+						if (err){
+							throw err;
+						}else {
+							result.forEach(function(task){
+								task.date.setHours(0,0,0,0);
+								if(task.date.getTime()>= thisMoment.getTime()){
+									task.date = moment(task.date).format("ddd DD MMM YYYY");
+									currentTasksArray.push(task);
+								}								
+							})
+							currentTasksArray.forEach(function(task){
+								task.unit.forEach(function(unitName){
+									if(foundUnit.name === unitName){
+										taskPerUnitArray.push(task);	
+									}
+								})
+							})
+							if(req.user.isManager){
+								res.render("tasks/index", {tasks: taskPerUnitArray, date: displayTime, user: req.user});
+							}
+						} 	
+						client.close();
+					});
+			});
+		}
+	})
+})
+
+function viewHistory(number,req,res){
+	var taskArray = [];
+	var newArray = [];
+	var toCurrent = {
+		route: "/task",
+		name: "Current Tasks"
+	}
+	mongoClient.connect(url, function(err, client) {  
+		if(err){
+			throw err;  
+		}
+		var db	= client.db(dbName);
+		var mysort = { date: 1 };
+  		db.collection("tasks").find().sort(mysort).toArray(function(err, result){
+    		if (err){
+				throw err;
+			}else {
+				result.forEach(function(task){
+					task.date.setHours(0,0,0,0);
+					if((thisMoment.getTime()-task.date.getTime())/(1000*3600*24)<number&&task.date.getTime() < thisMoment.getTime()){
+						task.date = moment(task.date).format("ddd DD MMM");
+						newArray.push(task);
+					}		
+				})
+				if(req.user.isManager){
+					res.render("tasks/history", {tasks: newArray, date: displayTime, route: toCurrent, user: req.user, dateNow: thisMoment});
+				}else {
+					newArray.forEach(function(task){
+						if(task.user.id.toString() === req.user._id.toString()){
+							taskArray.push(task);
+						}
+					})
+					res.render("tasks/history", {tasks: taskArray, date: displayTime, route: toCurrent,user: req.user, dateNow: thisMoment});
+				}
+			} 	
+    		client.close();
+  		});
+	}); 
+}
+
+//HISTORY ROUTE
+router.get("/history",middleware.isLoggedIn, function(req,res){
+	viewHistory(30,req,res);
+})
+
+//HISTORY 90
+router.get("/history_90",middleware.isLoggedIn, function(req,res){
+	viewHistory(90,req,res);
+})
+
+//HISTORY 180
+router.get("/history_180",middleware.isLoggedIn, function(req,res){
+	viewHistory(180,req,res);
+})
+
+
+module.exports 	= router;
+
+
+
+

@@ -34,6 +34,7 @@
 							<p class="card-text" id="nicknameOnTask"><strong><%=task.user.nickname%></strong> </p>
 									<ul id="taskListInTaskCard">
 										<% for(var i=0;i<task.unit.length;i++){ %>
+										<% console.log(task.unit[i].name) %>
 											<li><%=task.unit[i].name%> - <%=task.unit[i].status%></li>
 											<% if(i>=2){ %>
 											<li> See more + </li>
