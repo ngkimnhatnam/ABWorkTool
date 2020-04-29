@@ -1,7 +1,7 @@
 body {
-	background: #16222A;  /* fallback for old browsers */
-	background: -webkit-linear-gradient(to right, #3A6073, #16222A);  /* Chrome 10-25, Safari 5.1-6 */
-	background: linear-gradient(to right, #3A6073, #16222A); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+	background: #232526;  /* fallback for old browsers */
+	background: -webkit-linear-gradient(to right, #232526, #414345);  /* Chrome 10-25, Safari 5.1-6 */
+	background: linear-gradient(to right, #232526, #414345); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 
 }
 
@@ -16,11 +16,22 @@ h1 {
 #landing-header {
 	position: relative;
 	margin: auto;
-	width: 40%;
+	width: 50%;
 	padding-top: 12vh;
 }
 
 #buttons {
-	background: #377A98;
+	background: #19568b;
+	color: #ecf3e7;
+}
+
+#footer {
+	position: relative;
+	margin: auto;
+	margin-top: 100px;
+	width: 50%;
+	font-size: 0.9em;
 	color: white;
+	text-align: center;
+	font-family: 'Baloo Paaji 2', cursive;
 }

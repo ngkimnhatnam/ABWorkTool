@@ -3,16 +3,26 @@
 	<head>
 		<!-- Required meta tags -->
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>AirBnb WorkTool</title>
 		<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 		<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css2?family=Baloo+Paaji+2:wght@500&display=swap" rel="stylesheet">
 		<link rel="stylesheet" type="text/css" href="/stylesheets/landing.css">
-	
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.0/jquery.js"></script>
+		
 	</head>
 	<body>
 			<div id="landing-header">
+				<div class="container" id="flash_mes">
+				<% if(error && error.length > 0){ %>
+					<div class="alert alert-danger" role="alert"><%= error %></div>
+				<% } %>
+				<% if(success && success.length >0){ %>
+					<div class="alert alert-success" role="alert"><%= success %></div>
+				<% } %>
+				</div>
 				<h1>Welcome to AirBnb Work Tool</h1>
 				<form action="/login" method="POST">
 					<div class="form-group">
@@ -21,13 +31,20 @@
 					<div class="form-group">
 						<input class="form-control" type="password" name="password" placeholder="Password" required>
 					</div>
-					<div class="form-group">
-						<button class="btn btn-sm btn-block" id="buttons">Login</button>
+					<div class="form-group" style="margin-bottom: 8px;">
+						<button class="btn btn-sm btn-block" id="buttons"><strong>Login</strong></button>
 					</div>
 					<div class="form-group">
-						<a href="/reclaim_password" class="btn btn-sm  btn-block" id="buttons">Forgot password?</a>
+						<a href="/reclaim_password" class="btn btn-sm  btn-block" id="buttons"><strong>Forgot password?</strong></a>
 					</div>
-			</form>
+				</form>
 			</div>
+		
+		<script src="scripts/fadeFlashMes.js"></script>
+		<footer id="footer"> 
+			Powered by <i class="fab fa-html5"> </i> <i class="fab fa-css3-alt"></i> <i class="fab fa-bootstrap"></i> <i class="fab fa-node"></i>  |   
+			<i class="far fa-copyright"></i> 2020 by M&P
+	</footer>
 	</body>
+	
 </html>

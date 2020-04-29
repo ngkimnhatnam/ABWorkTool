@@ -1,20 +1,30 @@
 <%- include("../partials/header", {date: date}) %>
-	<header class="jumbotron">
-			<h1><%= unit.name %></h1>
-	</header>
-	<div class="container">
+	<div class="container" id="mainViewContainer">
 		<div class="row">
-			<div class="card" style="width: 40%;margin: auto;">
+			<div class="card" id="unitCardBodyDetail">
 				<img src="<%= unit.image %>" class="card-img-top" alt="...">
 					<div class="card-body">
-						<h5 class="card-title"><%= unit.name %></h5>
+						<h5 class="card-title" id="unitNameInUnitCard"><%= unit.name %></h5>
 						<p class="card-text">Check in/out time is: <%=unit.checkinout%></p>
-						<a href="/unit/<%=unit._id%>/edit" class="btn btn-warning">Edit</a>
 				    </div>
+				<div class="container">
+					<div class="row">
+						<% if(currentUser&&currentUser.isManager){%>
+							<div class="col" id="viewandDeleteButton">
+								<a href="/unit/<%=unit._id%>/edit" class="btn btn-block btn_rectangle btn_view">Edit</a>
+							</div>
+							<div class="col" id="viewandDeleteButton">
+								<form action="/unit/<%=unit._id%>?_method=delete" method="POST" id="taskDeleteButton">
+								<button class="btn btn-block btn_rectangle btn_delete">Delete</button>
+								</form>
+							</div>
+						<% } %>	
+					</div>	
+				</div>
 				
 			</div>
 		</div>
-		<a class="row" href="/unit" style="justify-content: center;">Back to all units</a>
+		<a class="row" href="/unit" id="backLink">Back to all units</a>
 		
 	</div>
 

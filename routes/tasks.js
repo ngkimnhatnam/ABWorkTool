@@ -1,18 +1,19 @@
-var express 			= require("express");
-var router				= express.Router();
-var Unit				= require("../models/unit");
-var Task 				= require("../models/task");
-var User				= require("../models/user");
-var Feedback			= require("../models/feedback");
-var moment				= require("moment");
-var displayTime 		= moment().format("ddd DD MMM YYYY");
-var mongoClient 		= require('mongodb').MongoClient;  
-var url 				= "mongodb://localhost";  
-var dbName 				= "airbnb";
-var thisMoment 			= new Date();
-thisMoment.setHours(0,0,0,0);
-var minDate 			= moment().format("YYYY-MM-DD");
-var middleware			= require("../middleware/index");
+var express 			= require("express"),
+	router				= express.Router(),
+	Unit				= require("../models/unit"),
+	Task 				= require("../models/task"),
+	User				= require("../models/user"),
+	Feedback			= require("../models/feedback"),
+	moment				= require("moment"),
+	displayTime 		= moment().format("ddd DD MMM YYYY"),
+	mongoClient 		= require('mongodb').MongoClient,
+	url 				= "mongodb://localhost",  
+	dbName 				= "airbnb",
+	expressSanitizer 	= require("express-sanitizer"),
+	thisMoment 			= new Date(),
+	minDate 			= moment().format("YYYY-MM-DD"),
+	middleware			= require("../middleware/index");
+	thisMoment.setHours(0,0,0,0);
 
 //INDEX TASK
 router.get("/",middleware.isLoggedIn, function(req,res){
@@ -35,7 +36,6 @@ router.get("/",middleware.isLoggedIn, function(req,res){
 						}		
 					})
 					if(req.user.isManager){
-						console.log("indexArray... "+ newArray);
 						res.render("tasks/index", {tasks: newArray, date: displayTime, user: req.user});
 					}else {
 						newArray.forEach(function(task){
@@ -98,6 +98,7 @@ router.post("/",middleware.isLoggedIn, function(req,res){
 						}
 				newUnit.push(assignedUnit);
 			}
+			req.body.sidenote	= req.sanitize(req.body.sidenote)
 			var newTask = {date: req.body.date, user: assignedWorker, unit: newUnit, sidenote: req.body.sidenote};
 			
 			//Create new tasks and adds to DB
@@ -148,7 +149,6 @@ router.get("/:id/edit",middleware.isLoggedIn, function(req,res){
 		if(err){
 			console.log(err);
 		}else {
-			console.log(foundTask);
 			res.render("tasks/edit", {task: foundTask, units: unitList, users: userList, date: displayTime, thisMoment: minDate});
 		}
 	})
@@ -165,7 +165,26 @@ router.put("/:id",middleware.isLoggedIn, function(req,res){
 				id: foundUser._id,
 				nickname: foundUser.nickname
 			}
-			var newTask = {date: req.body.date, user: assignedWorker, unit: req.body.unit, sidenote: req.body.sidenote};
+			
+			//This prepares an array with units and status before creating a task
+			var newUnit = [];
+			if(typeof req.body.unit !== "string"){
+				req.body.unit.forEach(function(unit){
+						var assignedUnit = {
+							name: unit,
+							status: "Not started"
+						}
+					newUnit.push(assignedUnit);
+				})
+			}else {
+				var assignedUnit = {
+							name: req.body.unit,
+							status: "Not started"
+						}
+				newUnit.push(assignedUnit);
+			}
+			req.body.sidenote	= req.sanitize(req.body.sidenote)
+			var newTask = {date: req.body.date, user: assignedWorker, unit: newUnit, sidenote: req.body.sidenote};
 			Task.findByIdAndUpdate(req.params.id, newTask,function(err, updatedTask){
 				if(err){
 					req.flash("error", "Error updating task");

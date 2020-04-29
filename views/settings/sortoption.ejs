@@ -1,72 +1,68 @@
 <%- include("../partials/header", {date: date}) %>
-	<header class="jumbotron">
-		<h1>You are in main work station</h1>
-	</header>
-	<div class="container" style="padding: 0;">
+	<div class="container" id="mainViewContainer">
 		<div class="row">
-			<div class="col-3">
-				<div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+			<div class="col-4 col-sm-2">
+				<div class="nav flex-column nav-pills stickyNavButtons" id="v-pills-tab" role="tablist" aria-orientation="vertical">
 					<% if(currentUser&&currentUser.isManager){%>
-					<a class="nav-link" href="/task/new">Add new task</a>
+					<a class="nav-link" href="/task/">View tasks</a>
 					<% } %>
 					<a class="nav-link" href="/unit">View Units</a>
 					<a class="nav-link" href="/history"> View History</a>
 				  	<a class="nav-link" data-toggle="collapse" href="#collapseSetting" aria-expanded="true" aria-controls="collapseSetting">Settings</a>
 					<div class="collapse" id="collapseSetting">
-						<ul class="list-group list-group-flush">
-							<li class="list-group-item list-group-item-action"><a class="nav-link" href="/change_password">Change password</a></li>
-							<li class="list-group-item list-group-item-action"><a class="nav-link" href="/sort_option">Sorting options</a></li>
+						<ul class="list-group" id="dropdownNavLinks">
+							<li class="list-group-item list-group-item-action" id="dropdownNavLinks"><a class="nav-link" href="/change_password/<%=user._id%>">Change password</a></li>
+							<li class="list-group-item list-group-item-action" id="dropdownNavLinks"><a class="nav-link" href="/sort_option">Sorting options</a></li>
 						</ul>
 					</div>
 				</div>
 			</div>
-			<div class="col-9">
+			<div class="col-8 col-sm-10">
 				<div class="row">
 					<div class="container">
-						<h2>
-							Choose how to view tasks
-						</h2>
-					
 						<form action="/sort_option" method="POST">
 							<div class="form-group">
 								<div class="row">
-								  <legend class="col-form-label col-sm-2 pt-0">Select one option:</legend>
-								  <div class="col-sm-10">
-									<div class="form-check">
-										<a class="btn btn-secondary" href="/task">By date</a>
-									</div>
-									<% if(currentUser&&currentUser.isManager){%>
-									<div class="form-check">
-									  <div class="dropdown">
-										  <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">By worker</a>
-										  <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-											<% users.forEach(function(user){ %>
-											<a class="dropdown-item" href="/sort_option/user/<%=user._id%>"><%=user.nickname%></a>
-											  <% }) %>
-											
-										  </div>
-										</div>
-									</div>
-									  <% } %>
-									<div class="form-check">
-									  <div class="dropdown">
-										  <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">By unit</a>
-										  <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-											<% units.forEach(function(unit){ %>
-											<a class="dropdown-item" href="/sort_option/unit/<%=unit._id%>"><%=unit.name%></a>
-											  <% }) %>
-											
-										  </div>
-										</div>
+									<legend class="col-form-label col-sm-3 pt-0">Select one option:</legend>
+									<div class="col-sm-9">
+										<div class="row">
+											<div class="col-xs-6 col-sm-6 col-md-4">
+												<a class="btn btn-block btn_rectangle btn_sortOptions" href="/task">By date</a>
+											</div>
+											<div class="col-xs-6 col-sm-6 col-md-4">
+												<div>
+													<div class="dropdown">
+														<a class="btn btn-block btn_rectangle btn_sortOptions dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">By unit</a>
+													 	<div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+														<% units.forEach(function(unit){ %>
+															<a class="dropdown-item" href="/sort_option/unit/<%=unit._id%>"><%=unit.name%></a>
+														<% }) %>
+													  	</div>
+													</div>
+												</div>
+											</div>
+											<div class="col-xs-6 col-sm-6 col-md-4">
+												<% if(currentUser&&currentUser.isManager){%>
+												<div>
+												  <div class="dropdown">
+													  <a class="btn btn-block btn_rectangle btn_sortOptions dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">By worker</a>
+													  <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+														<% users.forEach(function(user){ %>
+														<a class="dropdown-item" href="/sort_option/user/<%=user._id%>"><%=user.nickname%></a>
+														  <% }) %>
+
+													  </div>
+													</div>
+												</div>
+												<% } %>
+											</div>
 									  </div>
 								  </div>
 								</div>
 							  </div>
-							
 						</form>
 					</div>
 				</div>
-			
 			</div>
 		</div>
 	</div>

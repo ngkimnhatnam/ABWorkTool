@@ -1,7 +1,37 @@
-p Hi there #{nickname} !
-p Account has been created successfully.
-p Your username: #{username}
-p Your password: #{password}
-p You can start logging in via this link below.
-p <a href="#{link}">AirBnb Management Console</a>
-p In case of difficulties, please contact our customer support via email.
+doctype html
+html
+	head
+		link(rel="stylesheet", href="https://fonts.googleapis.com/css2?family=Baloo+Paaji+2:wght@500&display=swap" type="text/css")
+		link(href="https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap", rel="stylesheet")
+	body
+		h1 <img src="https://i.ibb.co/PMw2806/meo-Icon-Fotor.png" alt="meo-Icon-Fotor" border="0"> AirBnb Worktool  
+		p Hi #{nickname} !
+		p Account has been created successfully.<br>Your username: #{username}<br>Your password: #{password}
+		p You can start logging in via this link below.<br><a href="#{link}">AirBnb Management Console</a>
+		p In case of difficulties, please contact our customer support via email.
+		p <br>
+		p Best regards,
+		p AirBnb Worktool Support Team <br> Tel: +358123456  <br> Email: acbdef@mail.com
+		p <br>
+		p <hr>
+		footer 
+			p ABWorktool is a micromanagement tool dedicated to AirBnb operations that need a helping hand.
+			p Check us out at <a href="https://piupiu.run-eu-central1.goorm.io/">https://piupiu.run-eu-central1.goorm.io/</a>
+		
+style(type="text/css").
+	body {
+		position: relative;
+		margin: auto;
+		width: 50%;
+		padding-top: 12vh;
+		
+	}
+	h1 {
+		font-family: 'Baloo Paaji 2', cursive;
+		margin-bottom: 30px;
+		color:  #19568b;
+	}
+	p {
+		font-family: 'Roboto', sans-serif;
+	}
+	

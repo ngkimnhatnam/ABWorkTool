@@ -1,20 +1,21 @@
-var express 			= require("express");
-var router 				= express.Router();
-var passport			= require("passport");
-var nodemailer			= require("nodemailer");
-var moment				= require("moment");
-var mongoClient 		= require('mongodb').MongoClient; 
-var displayTime 		= moment().format("ddd DD MMM YYYY");
-var Unit				= require("../models/unit");
-var Task 				= require("../models/task");
-var User				= require("../models/user");
-var Feedback			= require("../models/feedback");
-var url 				= "mongodb://localhost";  
-var dbName 				= "airbnb";
-var thisMoment 			= new Date();
-thisMoment.setHours(0,0,0,0);
-var minDate 			= moment().format("YYYY-MM-DD");
-var middleware			= require("../middleware/index");
+var express 			= require("express"),
+	router 				= express.Router(),
+	passport			= require("passport"),
+	nodemailer			= require("nodemailer"),
+	moment				= require("moment"),
+	expressSanitizer 	= require("express-sanitizer"),
+	mongoClient 		= require('mongodb').MongoClient,
+	displayTime 		= moment().format("ddd DD MMM YYYY"),
+	Unit				= require("../models/unit"),
+	Task 				= require("../models/task"),
+	User				= require("../models/user"),
+	Feedback			= require("../models/feedback"),
+	url 				= "mongodb://localhost",
+	dbName 				= "airbnb",
+	thisMoment 			= new Date(),
+	minDate 			= moment().format("YYYY-MM-DD"),
+	middleware			= require("../middleware/index");
+	thisMoment.setHours(0,0,0,0);
 
 //Landing page
 router.get("/", function(req,res){
@@ -33,10 +34,15 @@ router.get("/register", function(req,res){
 //Create new USER then redirects
 router.post("/register", function(req,res){
 	if(req.body.manager==="on" && req.body.master==="master123"){
+		req.body.username = req.sanitize(req.body.username)
+		req.body.nickname = req.sanitize(req.body.nickname)
 		var newUser = new User({username: req.body.username,nickname: req.body.nickname, isManager: true});
 	}else {
+		req.body.username = req.sanitize(req.body.username)
+		req.body.nickname = req.sanitize(req.body.nickname)
 		var newUser = new User({username: req.body.username,nickname: req.body.nickname, isManager: false});
 	}	
+	req.body.password = req.sanitize(req.body.password)
 	//Create new user and adds to DB
 	User.register(newUser, req.body.password,function(err,newlyCreatedUser){
 		if(err){
@@ -121,7 +127,7 @@ router.get("/reclaim_password",function(req,res){
 //POST PW RETRIEVAL
 router.post("/reclaim_password", function(req,res){
 	var myMail = "celestialrailroad@gmail.com";
-	
+	req.body.username = req.sanitize(req.body.username)
 	User.find({}, function(err,allUsers){
 		allUsers.forEach(function(user){
 			if(user.username===req.body.username){
@@ -169,6 +175,8 @@ router.post("/reclaim_password", function(req,res){
 				  .catch(console.error);		
 			}
 		})
+		req.flash("success", "Password reset confirmation sent to your email.");
+		res.redirect("/");
 	});
 })
 
@@ -179,7 +187,6 @@ router.get("/reset_password/:id", function(req,res){
 		if(err){
 			console.log(err);
 		}else {
-			console.log(foundUser);
 			res.render("resetPassword", {user: foundUser});
 		}
 	})
@@ -187,7 +194,8 @@ router.get("/reset_password/:id", function(req,res){
 
 //PASSWORD RESET
 router.put("/reset_password/:id", function(req,res){
-	
+	req.body.password	= req.sanitize(req.body.password)
+	req.body.retype		= req.sanitize(req.body.retype)
 	if(req.body.password !== req.body.retype){
 		res.redirect("/reset_password/"+req.params.id);
 	}else {
@@ -200,6 +208,7 @@ router.put("/reset_password/:id", function(req,res){
 					updatedUser.save();	
 				})
 				req.flash("success","You reset password successfully!");
+				res.redirect("/");
 			}
 		})	
 	}
@@ -220,7 +229,8 @@ router.get("/change_password/:id", function(req,res){
 
 //CHANGE PASSWORD UPDATE
 router.put("/change_password/:id", function(req,res){
-	
+	req.body.password	= req.sanitize(req.body.password)
+	req.body.retype		= req.sanitize(req.body.retype)
 	if(req.body.password !== req.body.retype){
 		res.redirect("/change_password/"+req.params.id);
 	}else {
@@ -254,8 +264,7 @@ router.get("/sort_option",middleware.isLoggedIn, function(req,res){
 				if(err){
 					console.log(err);
 				}else {
-					//console.log(allUsers);
-					res.render("settings/sortoption", {units: allUnits, users: allUsers, date: displayTime});
+					res.render("settings/sortoption", {units: allUnits, users: allUsers, date: displayTime,user: req.user});
 				}
 			})
 		}
@@ -320,6 +329,7 @@ router.get("/sort_option/unit/:id",middleware.isLoggedIn, function(req,res){
 						if (err){
 							throw err;
 						}else {
+							
 							result.forEach(function(task){
 								task.date.setHours(0,0,0,0);
 								if(task.date.getTime()>= thisMoment.getTime()){
@@ -328,8 +338,8 @@ router.get("/sort_option/unit/:id",middleware.isLoggedIn, function(req,res){
 								}								
 							})
 							currentTasksArray.forEach(function(task){
-								task.unit.forEach(function(unitName){
-									if(foundUnit.name === unitName){
+								task.unit.forEach(function(singleUnitObject){
+									if(foundUnit.name === singleUnitObject.name){
 										taskPerUnitArray.push(task);	
 									}
 								})

@@ -1,9 +1,9 @@
 <%- include("../partials/header", {date: date}) %>
 
-<div class="container">
+<div class="container" id="mainViewContainer">
 	<div class="row">
-		<div style="width: 30%; margin: 25px auto;">
-			<h1 style="text-align: center">Edit this task </h1>
+		<div id="createTaskBody">
+			<h1 id="headingCreateTask">Edit this task </h1>
 			<form action="/task/<%=task._id%>?_method=PUT" method="POST">
 				<div class="form-group">
 					<input class="form-control" type="date" name="date" value="<%=task.date%>" min="<%=thisMoment%>">
@@ -17,7 +17,6 @@
 						<option value="<%=task.user.id%>" selected><%=task.user.nickname%></option>
 						
 						<% users.forEach(function(user){ %>
-						<% console.log("list of users "+ user); %>
 							<% if(user._id.toString() !== task.user.id.toString()){ %>
 								<option value="<%=user._id%>"><%=user.nickname%></option>
 							<% } %>
@@ -26,34 +25,32 @@
 					</div>
 				</div>
 				<div class="form-group">
-					<div class="input-group">
-						<% task.unit.forEach(function(name){ %>						
-							<input type="checkbox" id="chooseUnit" name="unit" value="<%=name%>" checked>
-						<label for="chooseUnit"><%=name%></label>
+						<% task.unit.forEach(function(unit){ %>						
+							<input type="checkbox" id="chooseUnit" name="unit" value="<%=unit.name%>" checked>
+						<label for="chooseUnit" class="checkBox"><%=unit.name%></label>
 						<% }) %>
 						<% for(var i=0;i<units.length;i++){ %>
 							<% for(var y=0;y<task.unit.length;y++){ %>
-								<%if(units[i].name === task.unit[y]){ %>
+								<%if(units[i].name === task.unit[y].name){ %>
 									<% units.splice(i,1); %>
 								<% } %>
 							<% } %>					  			
 						<% } %>	
 						<% units.forEach(function(unit){ %>
 							<input type="checkbox" id="chooseUnit" name="unit" value="<%=unit.name%>">
-								<label for="chooseUnit"><%=unit.name%></label>
+								<label for="chooseUnit" class="checkBox"><%=unit.name%></label>
 						<% }) %>
-					</div>
 				</div>
 				<div class="form-group">
 					<input class="form-control" type="text" name="sidenote" placeholder="Add sidenote here">
 				</div>
 				<div class="form-group">
-					<button class="btn btn-lg btn-primary btn-block">
+					<button class="btn btn-block btn_rectangle btn_add">
 						Update
 					</button>
 				</div>
 		</form>
-			<a href="/task">Back to tasks</a>
+			<a id="backLink" href="/task">Back to tasks</a>
 		</div>
 	</div>
 </div>

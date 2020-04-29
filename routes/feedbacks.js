@@ -1,12 +1,13 @@
-var express 			= require("express");
-var router 				= express.Router({mergeParams: true});
-var Task 				= require("../models/task");
-var Feedback			= require("../models/feedback");
-var Unit				= require("../models/unit");
-var User				= require("../models/user");
-var moment				= require("moment");
-var displayTime 		= moment().format("ddd DD MMM YYYY");
-var middleware			= require("../middleware/index");
+var express 			= require("express"),
+	router 				= express.Router({mergeParams: true}),
+	Task 				= require("../models/task"),
+	Feedback			= require("../models/feedback"),
+	Unit				= require("../models/unit"),
+	User				= require("../models/user"),
+	moment				= require("moment"),
+	expressSanitizer 	= require("express-sanitizer"),
+	displayTime 		= moment().format("ddd DD MMM YYYY"),
+	middleware			= require("../middleware/index");
 
 
 //FEEDBACK FORM
@@ -27,6 +28,7 @@ router.post("/",middleware.isLoggedIn, function(req,res){
 		if(err){
 			console.log(err);
 		}else {
+			req.body.feedback = req.sanitize(req.body.feedback)
 			Feedback.create(req.body.feedback, function(err, createdFeedback){
 				if(err){
 					console.log(err);

@@ -1,9 +1,10 @@
-var express 			= require("express");
-var router				= express.Router();
-var Unit				= require("../models/unit");
-var moment				= require("moment");
-var displayTime 		= moment().format("ddd DD MMM YYYY");
-var middleware			= require("../middleware/index");
+var express 			= require("express"),
+	router				= express.Router(),
+	Unit				= require("../models/unit"),
+	moment				= require("moment"),
+	displayTime 		= moment().format("ddd DD MMM YYYY"),
+	expressSanitizer 	= require("express-sanitizer"),
+	middleware			= require("../middleware/index");
 
 //INDEX UNIT
 router.get("/",middleware.isLoggedIn, function(req,res){
@@ -15,7 +16,7 @@ router.get("/",middleware.isLoggedIn, function(req,res){
 		if(err){
 			console.log(err);
 		}else {
-			res.render("units/", {units: allUnits, date: displayTime, route: toUnit});
+			res.render("units/", {units: allUnits, date: displayTime, route: toUnit,user: req.user});
 		}
 	});
 })
@@ -27,6 +28,9 @@ router.get("/new",middleware.isLoggedIn, function(req,res){
 
 //CREATE UNIT
 router.post("/",middleware.isLoggedIn, function(req,res){
+	req.body.name			= req.sanitize(req.body.name)
+	req.body.image			= req.sanitize(req.body.image)
+	req.body.checkinout		= req.sanitize(req.body.checkinout)
 	var newUnit = {name: req.body.name,image: req.body.image, checkinout: req.body.checkinout};
 	
 	//Create new units and adds to DB
@@ -65,6 +69,7 @@ router.get("/:id/edit",middleware.isLoggedIn, function(req,res){
 
 //UPDATE UNIT
 router.put("/:id",middleware.isLoggedIn,function(req,res){
+	req.body.unit	= req.sanitize(req.body.unit)
 	Unit.findByIdAndUpdate(req.params.id,req.body.unit, function(err,updatedUnit){
 		if(err){
 			res.redirect("/unit");

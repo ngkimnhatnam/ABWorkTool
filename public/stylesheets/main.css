@@ -1,44 +1,295 @@
 
 
+body {
+	background: #ecf3e7;
+}
 
+.jumbotron {
+	background: #232526;  /* fallback for old browsers */
+	background: -webkit-linear-gradient(to right, #232526, #414345);  /* Chrome 10-25, Safari 5.1-6 */
+	background: linear-gradient(to right, #232526, #414345); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+	color: #ecf3e7;
+}
+
+#jumbotron {
+	background: #232526;  /* fallback for old browsers */
+	background: -webkit-linear-gradient(to right, #232526, #414345);  /* Chrome 10-25, Safari 5.1-6 */
+	background: linear-gradient(to right, #232526, #414345); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+	color: #ecf3e7;
+}
+#jumbo {
+	padding-top: 20px;
+	padding-bottom: 20px;
+	border-radius: 0;
+}
+
+.col-4 {
+	padding-left: 0;
+}
+
+#pageName {
+	color: #ecf3e7;
+	font-size: 1.5em;
+	word-wrap: break-word;
+}
+
+#logout {
+	color: #19568b;
+	padding-top: 0;
+	font-weight: bold;
+}
+
+
+.card-title {
+	font-size: 1em;
+}
 
 .stickyNavButtons {
 	position: -webkit- sticky;
 	position: sticky;
-	top: 0;
+	top: 20%;
+	font-weight: bold;
 }
 
+.stickyNavButtons a {
+	color: #19568b;
+}
+
+.btn_rectangle {
+	border-radius: 0;	
+}
 
 #viewandDeleteButton {
 	padding: 0;
+	
 }
 
 #taskCardBody {
-	height: 300px;
+	height: 270px;
+	background: #ecf3e7;
 }
-
-
 
 #taskListInTaskCard {
 	list-style: none;
 	text-align: justify;
-	
 	padding: 0 10px 0 15px;
+}
+
+#taskCardBodyDetail {
+	width: 80%;
+	margin: auto;
+	background: #ecf3e7;
+}
+
+.borderTaskCardDetail {
+	border: 4px solid;
+	border-color: #01122b;
+	border-bottom-style: none;
+}
+
+#taskListInTaskCardDetail {
+	list-style: none;
+	text-align: justify;
+	padding: 0 10px 0 15px;
+}
+
+#unitListInTaskCardDetail {
+	list-style: none;
+	text-align: justify;
+	padding: 0 10px 0 40px;
+}
+
+#unitListInTaskCardDetail li{
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+#notStarted {
+	color: #ff0038;
+	font-style: italic;
+	font-weight: bold;
+}
+
+#inProgress {
+	color: #fe8302;
+	font-style: italic;
+	font-weight: bold;
+}
+
+#cleaningDone {
+	color: #092054;
+	font-style: italic;
+	font-weight: bold;
+}
+
+#allDone {
+	color: #258039;
+	font-style: italic;
+	font-weight: bold;
+}
+
+.btn_status {
+	background: #19568b;
+	border-color: #19568b;
+	color: #ecf3e7;
+	font-weight: bold;
+	width: 110px;
+	margin-left: 20px;
+	
+}
+
+.btn:hover {
+	color: #ecf3e7;
+} 
+
+#sidenoteFeedback {
+	font-style: italic;
+	font-weight: bold;
+}
+
+#feedbackCardBody {
+	width: 80%;
+	margin: auto;
+	background: #ecf3e7;
+}
+
+#feedbackContent {
+	background: #efefef;
+	width: 100%;
+}
+
+.borderFeedbackCardDetail {
+	border: 4px solid;
+	border-color: #01122b;
+}
+
+.fa-plus {
+	font-size: 0.8em;
+}
+
+#dropdownNavLinks {
+	background: #ecf3e7;
+	padding: 0 0 0 10px;
+	border: none;
+}
+
+#seeMore {
+	color: #969696;
 }
 
 #mainViewContainer {
 	padding: 0;
 }
 
-#borderOnTaskCard {
-	border-width: 4px !important;
+.border_todayTask {
+	border: 4px solid;
+	border-color: #fe8302;
 	padding-bottom: 5px;
+	border-bottom-style: none;
 }
+
+.border_futureTask {
+	border: 4px solid;
+	border-color: #01122b;
+	padding-bottom: 5px;
+	border-bottom-style: none;
+}
+
+#createTaskBody {
+	width: 80%; 
+	margin: 25px auto;
+	
+}
+
+#headingCreateTask {
+	text-align: center;
+	margin-bottom: 30px; 
+}
+
+.checkBox {
+  	position: relative;
+  	margin-right: 25px;
+  	font-size: 1.1em;
+  	
+}
+
+
+
 
 #taskDeleteButton {
 	display: inline;
 }
 
+.btn_view {
+	background: #19568b;
+	border-color: #19568b;
+	color: #ecf3e7;
+	font-weight: bold;
+}
+.btn_delete {
+	background: #ff0047;
+	border-color: #ff0047;
+	color: #ecf3e7;
+	font-weight: bold;
+}
+.btn_edit {
+	background: #fe8302;
+	border-color: #fe8302;
+	color: #ecf3e7;
+	font-weight: bold;
+}
+.btn_add {
+	background: #19568b;
+	border-color: #19568b;
+	color: #ecf3e7;
+	font-weight: bold;
+}
+
+.btn_sortOptions {
+	background: #19568b;
+	border: 5px solid;
+	border-color: #19568b;
+	color: #ecf3e7;
+	font-weight: bold;
+}
+
+.col-form-label {
+	font-style: italic;
+	font-weight: bold;
+}
+
 #nicknameOnTask {
 	font-size: 1.5em;
+	color: #ff0047;
+}
+
+#unitCardBody {
+	height: 500px;
+	background: #f4f4ef;
+}
+
+#unitCardBodyDetail {
+	width: 60%;
+	margin: auto;
+	background: #f4f4ef;
+}
+
+.unitImage {
+	width: 100%;
+	height: 350px;
+	object-fit: cover;
+}
+
+#unitNameInUnitCard {
+	color: #258039;
+	font-size: 1.3em;
+	font-weight: bold;
+}
+
+#backLink {
+	justify-content: center;
+	color: #19568b;
+	font-weight: bold;
+	margin-top: 15px;
+	margin-bottom: 15px;
 }

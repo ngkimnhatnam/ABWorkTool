@@ -1,10 +1,8 @@
 <%- include("../partials/header", {date: date}) %>
-	<header class="jumbotron">
-		<h1>You are in main work station</h1>
-	</header>
+	
 	<div class="container" id="mainViewContainer">
 		<div class="row">
-			<div class="col-3 col-sm-2" >
+			<div class="col-4 col-sm-2">
 				<div class="nav flex-column nav-pills stickyNavButtons" id="v-pills-tab" role="tablist" aria-orientation="vertical">
 					<% if(currentUser&&currentUser.isManager){%>
 					<a class="nav-link" href="/task/new">Add new task</a>
@@ -13,48 +11,56 @@
 					<a class="nav-link" href="/history"> View History</a>
 				  	<a class="nav-link" data-toggle="collapse" href="#collapseSetting" aria-expanded="true" aria-controls="collapseSetting">Settings</a>
 					<div class="collapse" id="collapseSetting">
-						<ul class="list-group list-group-flush">
-							<li class="list-group-item list-group-item-action"><a class="nav-link" href="/change_password/<%=user._id%>">Change password</a></li>
-							<li class="list-group-item list-group-item-action"><a class="nav-link" href="/sort_option">Sorting options</a></li>
+						<ul class="list-group" id="dropdownNavLinks">
+							<li class="list-group-item list-group-item-action" id="dropdownNavLinks"><a class="nav-link" href="/change_password/<%=user._id%>">Change password</a></li>
+							<li class="list-group-item list-group-item-action" id="dropdownNavLinks"><a class="nav-link" href="/sort_option">Sorting options</a></li>
 						</ul>
 					</div>
 				</div>
 			</div>
-			<div class="col-9 col-sm-10">	
+			<div class="col-8 col-sm-10">	
 				<div class="row">
 					<% tasks.forEach(function(task){ %>
 					<div class="col-md-6 col-lg-4" style="margin-bottom: 20px;">
 						<div class="card text-center" id="taskCardBody">
 							<% if(task.date == date){ %>
-								<div class="card-body border border-warning" id="borderOnTaskCard">
+								<div class="card-body border_todayTask">
 							<% } else {%>
-								<div class="card-body border border-success" id="borderOnTaskCard">
+								<div class="card-body border_futureTask">
 							<% } %>
 							<h5 class="card-title"><%=task.date%></h5>
 							<p class="card-text" id="nicknameOnTask"><strong><%=task.user.nickname%></strong> </p>
-									<ul id="taskListInTaskCard">
-										<% for(var i=0;i<task.unit.length;i++){ %>
-										<% console.log(task.unit[i].name) %>
-											<li><%=task.unit[i].name%> - <%=task.unit[i].status%></li>
-											<% if(i>=2){ %>
-											<li> See more + </li>
-											<% break; %>
-											<% } %>
-											<% i++ %>
-										<% } %>
-									</ul>
-							
+							<ul id="taskListInTaskCard">
+								<% for(var i=0;i<task.unit.length;i++){ %>
+									<% if(i==2){ %>
+										<li id="seeMore"> See more + </li>
+										<% break; %>
+									<% } %> 
+									<% if(task.unit[i].status === "Not started"){%>
+										<li><%=task.unit[i].name%> - <span id="notStarted"><%=task.unit[i].status%></span></li>	
+									<% } %> 
+									<% if(task.unit[i].status === "In progress"){%>
+										<li><%=task.unit[i].name%> - <span id="inProgress"><%=task.unit[i].status%></span></li>	
+									<% } %>
+									<% if(task.unit[i].status === "Cleaning done"){%>
+										<li><%=task.unit[i].name%> - <span id="cleaningDone"><%=task.unit[i].status%></span></li>	
+									<% } %>
+									<% if(task.unit[i].status === "All done"){%>
+										<li><%=task.unit[i].name%> - <span id="allDone"><%=task.unit[i].status%></span></li>	
+									<% } %>
+								
+								<% } %>
+							</ul> 
 							</div>
 							<div class="container">
-								
 								<div class="row">
 									<div class="col" id="viewandDeleteButton">
-										<a href="/task/<%=task._id%>" class="btn btn-primary btn-block">View</a>
+										<a href="/task/<%=task._id%>" class="btn btn-block btn_rectangle btn_view">View</a>
 									</div>
 									<% if(currentUser&&currentUser.isManager){%>
 										<div class="col" id="viewandDeleteButton">
 											<form action="/task/<%=task._id%>?_method=delete" method="POST" id="taskDeleteButton">
-											<button class="btn btn-danger btn-block" id="view_deleteButtonsInTaskCard2">Delete</button>
+											<button class="btn btn-block btn_rectangle btn_delete" >Delete</button>
 										</form>
 										</div>	
 									<% } %>

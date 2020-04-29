@@ -1,55 +1,65 @@
 <%- include("../partials/header", {date: date}) %>
-	<header class="jumbotron">
-		<h1>You are in main work station</h1>
-	</header>
-	<div class="container" style="padding: 0;">
+	<div class="container" id="mainViewContainer">
 		<div class="row">
-			<div class="col-3">
-				<div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+			<div class="col-4 col-sm-2">
+				<div class="nav flex-column nav-pills stickyNavButtons" id="v-pills-tab" role="tablist" aria-orientation="vertical">
 					<% if(currentUser&&currentUser.isManager){%>
 					<a class="nav-link" href="/task/new">Add new task</a>
 					<% } %>
 					<a class="nav-link" href="/unit">View Units</a>
 					<a class="nav-link" href="<%= route.route%>"> View <%=route.name%></a>
 					<a class="nav-link" data-toggle="collapse" href="#collapseExample" aria-expanded="true" aria-controls="collapseExample">
-    View archive
+						Filter archive <i class="fas fa-plus"></i>
   </a>
 					<div class="collapse" id="collapseExample">
-						<ul class="list-group list-group-flush">
-							<li class="list-group-item list-group-item-action"><a class="nav-link" href="/history">Last 30 days</a></li>
-							<li class="list-group-item list-group-item-action"><a class="nav-link" href="/history_90">Last 90 days</a></li>
-							<li class="list-group-item list-group-item-action"><a class="nav-link" href="/history_180">Last 180 days</a></li>
+						<ul class="list-group" id="dropdownNavLinks">
+							<li class="list-group-item list-group-item-action" id="dropdownNavLinks"><a class="nav-link" href="/history">Last 30 days</a></li>
+							<li class="list-group-item list-group-item-action" id="dropdownNavLinks"><a class="nav-link" href="/history_90">Last 90 days</a></li>
+							<li class="list-group-item list-group-item-action" id="dropdownNavLinks"><a class="nav-link" href="/history_180">Last 180 days</a></li>
 						</ul>
 					</div>
 				  	<a class="nav-link" data-toggle="collapse" href="#collapseSetting" aria-expanded="true" aria-controls="collapseSetting">Settings</a>
 					<div class="collapse" id="collapseSetting">
-						<ul class="list-group list-group-flush">
-							<li class="list-group-item list-group-item-action"><a class="nav-link" href="/change_password/<%=user._id%>">Change password</a></li>
-							<li class="list-group-item list-group-item-action"><a class="nav-link" href="/sort_option">Sorting options</a></li>
+						<ul class="list-group" id="dropdownNavLinks">
+							<li class="list-group-item list-group-item-action" id="dropdownNavLinks"><a class="nav-link" href="/change_password/<%=user._id%>">Change password</a></li>
+							<li class="list-group-item list-group-item-action" id="dropdownNavLinks"><a class="nav-link" href="/sort_option">Sorting options</a></li>
 						</ul>
 					</div>
 				</div>
 			</div>
-			<div class="col-9">
+			<div class="col-8 col-sm-10">
 				<div class="row">
 					<% tasks.forEach(function(task){ %>
 						<div class="col-md-6 col-lg-4" style="margin-bottom: 20px;">
-							<div class="card h-100 text-center">
-								<div class="card-body">
+							<div class="card text-center" id="taskCardBody">
+								<div class="card-body border_futureTask">
 									<h5 class="card-title"><%=task.date%></h5>
-									<p class="card-text" style="font-size: 1.5em;"><strong><%=task.user.nickname%></strong> </p>
-									<ul>
-										<% task.unit.forEach(function(unit){ %>
-										<li><%=unit.name%> - <%=unit.status%></li>
-										<% }) %>
+									<p class="card-text" id="nicknameOnTask"><strong><%=task.user.nickname%></strong> </p>
+									<ul id="taskListInTaskCard">
+										<% for(var i=0;i<task.unit.length;i++){ %>
+											<% if(i==2){ %>
+												<li> See more + </li>
+												<% break; %>
+											<% } %> 	
+											<li><%=task.unit[i].name%> - <%=task.unit[i].status%></li>	
+										<% } %>
 									</ul>
-									<a href="/task/<%=task._id%>" class="btn btn-primary">View</a>
-									<% if(currentUser&&currentUser.isManager){%>
-									<form action="/task/<%=task._id%>?_method=delete" method="POST" style="display: inline;">
-										<button class="btn btn-danger">Delete</button>
-									</form>
-									<% } %>
 								</div>
+								<div class="container">
+								
+									<div class="row">
+										<div class="col" id="viewandDeleteButton">
+											<a href="/task/<%=task._id%>" class="btn btn-block btn_rectangle btn_view">View</a>
+										</div>
+										<% if(currentUser&&currentUser.isManager){%>
+											<div class="col" id="viewandDeleteButton">
+												<form action="/task/<%=task._id%>?_method=delete" method="POST" id="taskDeleteButton">
+												<button class="btn btn-block btn_rectangle btn_delete" >Delete</button>
+											</form>
+											</div>	
+										<% } %>
+									</div>	
+							</div>
 							</div>
 						</div>
 					<% }) %>

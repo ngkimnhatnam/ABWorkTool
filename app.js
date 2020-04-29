@@ -11,6 +11,11 @@ var express 			= require("express"),
 	moment				= require("moment"),
 	nodemailer			= require("nodemailer"),
 	flash				= require("connect-flash"),
+	expressSanitizer 	= require("express-sanitizer"),
+	mongoClient 		= require('mongodb').MongoClient,  
+	url 				= "mongodb://localhost",  
+	dbName 				= "airbnb",
+	sortMethod 			= "date",
 	app 				= express();
 	
 //requiring routes
@@ -24,16 +29,12 @@ thisMoment.setHours(0,0,0,0);
 var minDate = moment().format("YYYY-MM-DD");
 var displayTime = moment().format("ddd DD MMM YYYY");
  
-var mongoClient = require('mongodb').MongoClient;  
-var url = "mongodb://localhost";  
-var dbName 	= "airbnb";
-var sortMethod = "date";
- 
 mongoose.connect("mongodb://localhost/airbnb",{ useNewUrlParser: true, useUnifiedTopology: true });
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine","ejs");
 app.use(methodOverride("_method"));
+app.use(expressSanitizer());
 app.use(express.static(__dirname + "/public"));
 app.use(flash());
 
