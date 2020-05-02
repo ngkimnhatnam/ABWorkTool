@@ -35,16 +35,15 @@ router.get("/register", function(req,res){
 
 //Create new USER then redirects
 router.post("/register", function(req,res){
+	req.body.username = req.sanitize(req.body.username)
+	req.body.nickname = req.sanitize(req.body.nickname)	
+	req.body.password = req.sanitize(req.body.password)
+	
 	if(req.body.manager==="on" && req.body.master==="master123"){
-		req.body.username = req.sanitize(req.body.username)
-		req.body.nickname = req.sanitize(req.body.nickname)
 		var newUser = new User({username: req.body.username,nickname: req.body.nickname, isManager: true});
 	}else {
-		req.body.username = req.sanitize(req.body.username)
-		req.body.nickname = req.sanitize(req.body.nickname)
 		var newUser = new User({username: req.body.username,nickname: req.body.nickname, isManager: false});
-	}	
-	req.body.password = req.sanitize(req.body.password)
+	}
 	if(!req.body.password){
 		req.flash("error", "Password cannot be empty");
 		res.redirect("back");
@@ -52,9 +51,9 @@ router.post("/register", function(req,res){
 		//Create new user and adds to DB
 		User.register(newUser, req.body.password,function(err,newlyCreatedUser){
 			if(err){
-				req.flash("error", "Error creating user");
+				req.flash("error", err.message);
 				console.log(err);
-				return res.render("/register", {error: err.message});
+				return res.render("register", {error: err.message});
 			}
 			passport.authenticate("local")(req,res,function(){
 				req.flash("success", "Account successfully created");
