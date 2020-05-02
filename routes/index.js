@@ -53,7 +53,7 @@ router.post("/register", function(req,res){
 			if(err){
 				req.flash("error", err.message);
 				console.log(err);
-				return res.render("register", {error: err.message});
+				return res.render("register");
 			}
 			passport.authenticate("local")(req,res,function(){
 				req.flash("success", "Account successfully created");
