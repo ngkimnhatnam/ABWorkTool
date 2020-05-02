@@ -33,8 +33,6 @@ var displayTime = moment().format("ddd DD MMM YYYY");
 
 var dbUrl = process.env.DATABASEURL || "mongodb://localhost/airbnb"
 mongoose.connect(dbUrl,{ useNewUrlParser: true, useUnifiedTopology: true });
- // mongoose.connect("mongodb+srv://ngkimnhatnam:Nhatnam92@airbnbworktoolcluster-lkprs.mongodb.net/airbnbworktool?retryWrites=true&w=majority",{ useNewUrlParser: true, useUnifiedTopology: true });
-
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine","ejs");

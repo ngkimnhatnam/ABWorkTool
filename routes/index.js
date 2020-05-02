@@ -60,30 +60,16 @@ router.post("/register", function(req,res){
 				req.flash("success", "Account successfully created");
 				res.redirect("/");
 			})
-
-			// let transport = nodemailer.createTransport({
-			// 	// service: "gmail",
-			// 	// auth: {
-			// 	// user: 'ngkimnhatnam@gmail.com',
-			// 	// pass: 'Ngkimnhatnam92'
-			// 	// }
-			// 	host: 'smtp.mailtrap.io',
-			// 	port: 2525,
-			// 	auth: {
-			// 	user: '48aabd7aa3cb7c',
-			// 	pass: '21881e8e51e9d6'}
-			// })
-
 			const Email = require('email-templates');
 			const email = new Email({
 				// uncomment below to send emails in development/test env:
 				send: true,
 				transport: {
-					host: 'smtp.mailtrap.io',
-					port: 2525,
+					service: "gmail",
 					auth: {
-					user: '48aabd7aa3cb7c',
-					pass: '21881e8e51e9d6'}
+					user: 'abworktool@gmail.com',
+					pass: 'Nhatnam92'
+					}
 				}
 			});
 
@@ -91,14 +77,14 @@ router.post("/register", function(req,res){
 			.send({
 			template: 'accountCreation',
 			message: {
-				from: 'account@airbnbtool.com',
+				from: 'abworktool@gmail.com',
 				to: req.body.username
 			},
 				locals: {
 					username: req.body.username,
 					nickname: req.body.nickname,
 					password: req.body.password,
-					link:	'https://piupiu.run-eu-central1.goorm.io/'
+					link:	'https://arcane-tundra-61659.herokuapp.com/'
 				}
 			})
 			.then(console.log)
@@ -137,35 +123,21 @@ router.get("/reclaim_password",function(req,res){
 
 //POST PW RETRIEVAL
 router.post("/reclaim_password", function(req,res){
-	var myMail = "celestialrailroad@gmail.com";
 	req.body.username = req.sanitize(req.body.username)
 	User.find({}, function(err,allUsers){
 		allUsers.forEach(function(user){
 			if(user.username===req.body.username){
-				// let transport = nodemailer.createTransport({
-				// 	// service: "gmail",
-				// 	// auth: {
-				// 	// user: 'ngkimnhatnam@gmail.com',
-				// 	// pass: 'Ngkimnhatnam92'
-				// 	// }
-				// 	host: 'smtp.mailtrap.io',
-				// 	port: 2525,
-				// 	auth: {
-				// 	user: '48aabd7aa3cb7c',
-				// 	pass: '21881e8e51e9d6'}
-				// })
-				
 				const Email = require('email-templates');
 				const email = new Email({
 
 				  // uncomment below to send emails in development/test env:
 				  send: true,
 				  transport: {
-					host: 'smtp.mailtrap.io',
-					port: 2525,
+					service: "gmail",
 					auth: {
-					user: '48aabd7aa3cb7c',
-					pass: '21881e8e51e9d6'}
+					user: 'abworktool@gmail.com',
+					pass: 'Nhatnam92'
+					}
 				  }
 				});
 
@@ -173,13 +145,13 @@ router.post("/reclaim_password", function(req,res){
 				  .send({
 					template: 'resetPass',
 					message: {
-						from: 'myemail@gmail.com',
-						to: 'youremail@gmail.com'
+						from: 'abworktool@gmail.com',
+						to: req.body.username
 						
 					},
 					locals: {
 						nickname: user.nickname,
-						link:	'https://piupiu.run-eu-central1.goorm.io/reset_password/'+user._id
+						link:	'https://arcane-tundra-61659.herokuapp.com/reset_password/'+user._id
 					}
 				  })
 				  .then(console.log)
