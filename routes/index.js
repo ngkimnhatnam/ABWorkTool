@@ -53,44 +53,44 @@ router.post("/register", function(req,res){
 			if(err){
 				req.flash("error", err.message);
 				return res.render("register");
-			}
-			passport.authenticate("local")(req,res,function(){
+			}else {
+				passport.authenticate("local")(req,res,function(){
 				req.flash("success", "Account successfully created");
 				res.redirect("/");
-			})
-			const Email = require('email-templates');
-			const email = new Email({
-				// uncomment below to send emails in development/test env:
-				send: true,
-				transport: {
-					service: "gmail",
-					auth: {
-					user: 'abworktool@gmail.com',
-					pass: 'Nhatnam92'
+				})
+				
+				const Email = require('email-templates');
+				const email = new Email({
+					// uncomment below to send emails in development/test env:
+					send: true,
+					transport: {
+						service: "gmail",
+						auth: {
+						user: 'abworktool@gmail.com',
+						pass: 'Nhatnam92'
+						}
 					}
-				}
-			});
+				});
 
-			email
-			.send({
-			template: 'accountCreation',
-			message: {
-				from: 'abworktool@gmail.com',
-				to: req.body.username
-			},
-				locals: {
-					username: req.body.username,
-					nickname: req.body.nickname,
-					password: req.body.password,
-					link:	'https://arcane-tundra-61659.herokuapp.com/'
-				}
-			})
-			.then(console.log)
-			.catch(console.error);			
+				email
+				.send({
+				template: 'accountCreation',
+				message: {
+					from: 'abworktool@gmail.com',
+					to: req.body.username
+				},
+					locals: {
+						username: req.body.username,
+						nickname: req.body.nickname,
+						password: req.body.password,
+						link:	'https://arcane-tundra-61659.herokuapp.com/'
+					}
+				})
+				.then(console.log)
+				.catch(console.error);	
+			}		
 		});
-		
 	}
-	
 })
 
 //This route handles login
