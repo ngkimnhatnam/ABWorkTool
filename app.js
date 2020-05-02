@@ -31,7 +31,8 @@ thisMoment.setHours(0,0,0,0);
 var minDate = moment().format("YYYY-MM-DD");
 var displayTime = moment().format("ddd DD MMM YYYY");
 
-mongoose.connect(process.env.DATABASEURL,{ useNewUrlParser: true, useUnifiedTopology: true });
+var dbUrl = process.env.DATABASEURL || "mongodb://localhost/airbnb"
+mongoose.connect(dbUrl,{ useNewUrlParser: true, useUnifiedTopology: true });
  // mongoose.connect("mongodb+srv://ngkimnhatnam:Nhatnam92@airbnbworktoolcluster-lkprs.mongodb.net/airbnbworktool?retryWrites=true&w=majority",{ useNewUrlParser: true, useUnifiedTopology: true });
 
 

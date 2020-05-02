@@ -78,7 +78,10 @@ router.get("/:id/edit",middleware.isLoggedIn, function(req,res){
 
 //UPDATE UNIT
 router.put("/:id",middleware.isLoggedIn,function(req,res){
-	req.body.unit	= req.sanitize(req.body.unit)
+	req.body.unit.name			= req.sanitize(req.body.unit.name)
+	req.body.unit.image			= req.sanitize(req.body.unit.image)
+	req.body.unit.checkinout	= req.sanitize(req.body.unit.checkinout)
+	req.body.unit.description	= req.sanitize(req.body.unit.description)
 	Unit.findByIdAndUpdate(req.params.id,req.body.unit, function(err,updatedUnit){
 		if(err){
 			req.flash("error", "Error updating unit");

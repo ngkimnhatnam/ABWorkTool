@@ -10,8 +10,10 @@ var express 			= require("express"),
 	Task 				= require("../models/task"),
 	User				= require("../models/user"),
 	Feedback			= require("../models/feedback"),
-	url 				= "mongodb://localhost",
-	dbName 				= "airbnb",
+	// url 				= "mongodb://localhost",  
+	// dbName 				= "airbnb",
+	url					= "mongodb+srv://ngkimnhatnam:Nhatnam92@airbnbworktoolcluster-lkprs.mongodb.net",
+	dbName				= "airbnbworktool",
 	thisMoment 			= new Date(),
 	minDate 			= moment().format("YYYY-MM-DD"),
 	middleware			= require("../middleware/index");
@@ -197,7 +199,8 @@ router.get("/reset_password/:id", function(req,res){
 	
 	User.findById(req.params.id, function(err, foundUser){
 		if(err){
-			console.log(err);
+			req.flash("error", "Error finding user");
+			res.redirect("back");
 		}else {
 			res.render("resetPassword", {user: foundUser});
 		}
@@ -239,7 +242,8 @@ router.get("/change_password/:id", function(req,res){
 	
 	User.findById(req.params.id, function(err, foundUser){
 		if(err){
-			console.log(err);
+			req.flash("error", "Error finding user");
+			res.redirect("back");
 		}else {
 			res.render("settings/pwchange", {user: foundUser, date: displayTime});
 		}
@@ -250,7 +254,7 @@ router.get("/change_password/:id", function(req,res){
 router.put("/change_password/:id", function(req,res){
 	req.body.password	= req.sanitize(req.body.password)
 	req.body.retype		= req.sanitize(req.body.retype)
-	console.log("Changed password..."+ req.body.password);
+	
 	if(req.body.password !== req.body.retype){
 		req.flash("error", "Confirming password doesn't match");
 		res.redirect("/change_password/"+req.params.id);
@@ -263,7 +267,6 @@ router.put("/change_password/:id", function(req,res){
 			if(err){
 				req.flash("error", "Error finding user");
 				res.redirect("back");
-				console.log(err);
 			}else {
 				updatedUser.setPassword(req.body.password, function(){
 					updatedUser.save();	
@@ -286,11 +289,13 @@ router.get("/sort_option",middleware.isLoggedIn, function(req,res){
 	
 	Unit.find({}, function(err, allUnits){
 		if(err){
-			console.log(err);
+			req.flash("error", "Error finding units");
+			res.redirect("back");
 		}else {
 			User.find({}, function(err, allUsers){
 				if(err){
-					console.log(err);
+					req.flash("error", "Error finding users");
+					res.redirect("back");
 				}else {
 					res.render("settings/sortoption", {units: allUnits, users: allUsers, date: displayTime,user: req.user});
 				}
@@ -308,7 +313,8 @@ router.get("/sort_option/user/:id",middleware.isLoggedIn, function(req,res){
 	
 	User.findById(req.params.id, function(err,foundUser){
 		if(err){
-			console.log(err);
+			req.flash("error", "Error finding user");
+			res.redirect("back");
 		}else {
 			mongoClient.connect(url, function(err, client) {  
 				if(err){throw err;}
@@ -347,7 +353,8 @@ router.get("/sort_option/unit/:id",middleware.isLoggedIn, function(req,res){
 	
 	Unit.findById(req.params.id, function(err,foundUnit){
 		if(err){
-			console.log(err);
+			req.flash("error", "Error finding unit");
+			res.redirect("back");
 		}else {
 			mongoClient.connect(url, function(err, client) {  
 				if(err){throw err;}
@@ -392,6 +399,8 @@ function viewHistory(number,req,res){
 	}
 	mongoClient.connect(url, function(err, client) {  
 		if(err){
+			req.flash("error", "Error connecting database");
+			res.redirect("back");
 			throw err;  
 		}
 		var db	= client.db(dbName);
