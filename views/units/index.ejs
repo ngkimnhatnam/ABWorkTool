@@ -1,5 +1,15 @@
 <%- include("../partials/header", {date: date}) %>
-	
+<header class="jumbotron" id="jumbo">
+	<h1 id="pageName"><a class="navbar-brand" href="/" id="pageName">Units</a></h1>
+</header>
+	<div class="container" id="flash_mes">
+	<% if(error && error.length > 0){ %>
+		<div class="alert alert-danger" role="alert"><%= error %></div>
+	<% } %>
+	<% if(success && success.length >0){ %>
+		<div class="alert alert-success" role="alert"><%= success %></div>
+	<% } %>
+		</div>
 	<div class="container" id="mainViewContainer">
 		<div class="row">
 			<div class="col-4 col-sm-2">
@@ -7,12 +17,11 @@
 					<% if(currentUser&&currentUser.isManager){%>
 				  	<a class="nav-link" href="<%=route.route%>">Add <%=route.name%></a>
 					<% } %>
-					  <a class="nav-link" href="/task"> View Tasks</a>
+					  <a class="nav-link" href="/task"> Back to Tasks</a>
 					  <a class="nav-link" data-toggle="collapse" href="#collapseSetting" aria-expanded="true" aria-controls="collapseSetting">Settings</a>
 						<div class="collapse" id="collapseSetting">
 							<ul class="list-group" id="dropdownNavLinks">
 								<li class="list-group-item list-group-item-action" id="dropdownNavLinks"><a class="nav-link" href="/change_password/<%=user._id%>">Change password</a></li>
-								<li class="list-group-item list-group-item-action" id="dropdownNavLinks"><a class="nav-link" href="/sort_option">Sorting options</a></li>
 							</ul>
 						</div>
 				</div>
@@ -25,7 +34,7 @@
 								<img src="<%= unit.image %>" class="card-img-top unitImage" alt="...">
 								<div class="card-body">
 									<h5 class="card-title" id="unitNameInUnitCard"><%= unit.name %></h5>
-									<p class="card-text">Check in/out time: <%=unit.checkinout%></p>
+									<p class="card-text"><strong>Check in/out time:</strong> <%=unit.checkinout%></p>
 					  			</div>
 								<div class="container">
 								
@@ -34,10 +43,25 @@
 											<a href="/unit/<%= unit._id %>" class="btn btn-block btn_rectangle btn_view">View unit</a>
 										</div>
 										<% if(currentUser&&currentUser.isManager){%>
-											<div class="col" id="viewandDeleteButton">
-												<form action="/unit/<%=unit._id%>?_method=delete" method="POST" id="taskDeleteButton">
-												<button class="btn btn-block btn_rectangle btn_delete" >Delete</button>
-											</form>
+											<div class="col" id="viewandDeleteButton">	
+												<button class="btn btn-block btn_rectangle btn_delete" id="deleteTaskButton" data-toggle="modal" data-target="#id<%=unit._id%>" >Delete</button>			 
+											<!-- Modal -->
+											<!-- Adding ids to modal and trigger button to open correct modal. ID also cannot start with number, so add some strings upfront -->
+											<div class="modal fade" id="id<%=unit._id%>" tabindex="-1" role="dialog" aria-hidden="true">
+												<div class="modal-dialog modal-dialog-centered" role="document">
+													<div class="modal-content">
+														<div class="modal-body">
+															Deleting this unit?
+														</div>
+														<div class="modal-footer">
+															<button type="button" class="btn btn_view btn_rectangle" data-dismiss="modal">Cancel</button>
+															<form action="/unit/<%=unit._id%>?_method=delete" method="POST" id="deleteForm">
+																<button class="btn btn_rectangle btn_delete">Delete</button>
+															</form> 
+														</div>
+													</div>
+												</div>
+											</div>
 											</div>	
 										<% } %>
 									</div>	

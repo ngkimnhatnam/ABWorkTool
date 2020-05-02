@@ -83,34 +83,42 @@ router.post("/",middleware.isLoggedIn, function(req,res){
 			}
 			//This prepares an array with units and status before creating a task
 			var newUnit = [];
-			if(typeof req.body.unit !== "string"){
-				req.body.unit.forEach(function(unit){
-						var assignedUnit = {
-							name: unit,
-							status: "Not started"
-						}
-					newUnit.push(assignedUnit);
-				})
-			}else {
-				var assignedUnit = {
-							name: req.body.unit,
-							status: "Not started"
-						}
-				newUnit.push(assignedUnit);
-			}
-			req.body.sidenote	= req.sanitize(req.body.sidenote)
-			var newTask = {date: req.body.date, user: assignedWorker, unit: newUnit, sidenote: req.body.sidenote};
-			
-			//Create new tasks and adds to DB
-			Task.create(newTask,function(err, newlyCreatedTask){
-				if(err){
-					req.flash("error", "Unable to create task");
-					console.log(err);
+			if(err||!req.body.unit){
+					req.flash("error", "Please select at least one unit");
+					res.redirect("back");
 				}else {
-					req.flash("success", "Task created");
-					res.redirect("/task");
+					if(typeof req.body.unit !== "string"){
+						req.body.unit.forEach(function(unit){
+								var assignedUnit = {
+									name: unit,
+									status: "Not started"
+								}
+							newUnit.push(assignedUnit);
+						})
+					}else {
+						var assignedUnit = {
+									name: req.body.unit,
+									status: "Not started"
+								}
+						newUnit.push(assignedUnit);
+					}
+					
+					req.body.sidenote	= req.sanitize(req.body.sidenote)
+					var newTask = {date: req.body.date, user: assignedWorker, unit: newUnit, sidenote: req.body.sidenote};
+
+					//Create new tasks and adds to DB
+					Task.create(newTask,function(err, newlyCreatedTask){
+						if(err){
+							req.flash("error", "Unable to create task");
+							console.log(err);
+						}else {
+							req.flash("success", "Task created");
+							res.redirect("/task");
+						}
+					})
 				}
-			})
+			
+			
 		}
 	})
 })
@@ -120,6 +128,8 @@ router.get("/:id",middleware.isLoggedIn, function(req,res){
 	
 	Task.findById(req.params.id).populate("feedback").exec(function(err, foundTask){
 		if(err){
+			req.flash("error", "Error finding task");
+			res.redirect("back");
 			console.log(err);
 		}else {
 			res.render("tasks/show", {task: foundTask, date: displayTime, dateNow: thisMoment});
@@ -147,8 +157,11 @@ router.get("/:id/edit",middleware.isLoggedIn, function(req,res){
 	})
 	Task.findById(req.params.id, function(err,foundTask){
 		if(err){
+			req.flash("error", "Error finding task");
+			res.redirect("back");
 			console.log(err);
 		}else {
+			foundTask.date = moment(foundTask.date).format("YYYY-MM-DD");
 			res.render("tasks/edit", {task: foundTask, units: unitList, users: userList, date: displayTime, thisMoment: minDate});
 		}
 	})
@@ -164,36 +177,44 @@ router.put("/:id",middleware.isLoggedIn, function(req,res){
 			var assignedWorker = {
 				id: foundUser._id,
 				nickname: foundUser.nickname
-			}
-			
+			}		
 			//This prepares an array with units and status before creating a task
 			var newUnit = [];
-			if(typeof req.body.unit !== "string"){
-				req.body.unit.forEach(function(unit){
-						var assignedUnit = {
-							name: unit,
-							status: "Not started"
-						}
-					newUnit.push(assignedUnit);
-				})
-			}else {
-				var assignedUnit = {
-							name: req.body.unit,
-							status: "Not started"
-						}
-				newUnit.push(assignedUnit);
-			}
-			req.body.sidenote	= req.sanitize(req.body.sidenote)
-			var newTask = {date: req.body.date, user: assignedWorker, unit: newUnit, sidenote: req.body.sidenote};
-			Task.findByIdAndUpdate(req.params.id, newTask,function(err, updatedTask){
-				if(err){
-					req.flash("error", "Error updating task");
-					res.redirect("/task");
+			if(err||!req.body.unit){
+					req.flash("error", "Please select at least one unit");
+					res.redirect("back");
 				}else {
-					req.flash("success", "Task updated");
-					res.redirect("/task/"+req.params.id);
+					if(typeof req.body.unit !== "string"){
+						req.body.unit.forEach(function(unit){
+								var assignedUnit = {
+									name: unit,
+									status: "Not started"
+								}
+							newUnit.push(assignedUnit);
+						})
+					}else {
+						var assignedUnit = {
+									name: req.body.unit,
+									status: "Not started"
+								}
+						newUnit.push(assignedUnit);
+					}
+					
+					req.body.sidenote	= req.sanitize(req.body.sidenote)
+					var newTask = {date: req.body.date, user: assignedWorker, unit: newUnit, sidenote: req.body.sidenote};
+					Task.findByIdAndUpdate(req.params.id, newTask,function(err, updatedTask){
+						if(err){
+							req.flash("error", "Error updating task");
+							res.redirect("back");
+						}else {
+							req.flash("success", "Task updated");
+							res.redirect("/task/"+req.params.id);
+						}
+					})
+					
 				}
-			})
+			
+			
 		}
 	})
 })
@@ -203,6 +224,8 @@ router.put("/:id/status",middleware.isLoggedIn, function(req,res){
 	
 	Task.findById(req.params.id, function(err, foundTask){
 		if(err){
+			req.flash("error", "Error finding task");
+			res.redirect("back");
 			console.log(err);
 		}else {
 			var newTask;
@@ -237,7 +260,9 @@ router.put("/:id/status",middleware.isLoggedIn, function(req,res){
 			})
 			Task.findByIdAndUpdate(req.params.id, newTask,function(err, updatedTask){
 				if(err){
-					res.redirect("/task");
+					req.flash("error", "Error updating status");
+					res.redirect("back");
+					console.log(err);
 				}else {
 					res.redirect("/task/"+req.params.id);
 				}
@@ -248,14 +273,19 @@ router.put("/:id/status",middleware.isLoggedIn, function(req,res){
 
 //DELETE TASK
 router.delete("/:id", function(req,res){
-	Task.findByIdAndRemove(req.params.id,function(err){
+		
+		Task.findByIdAndRemove(req.params.id,function(err){
 		if(err){
+			req.flash("error", "Error deleting task");
+			res.redirect("back");
 			console.log(err);
 		}else {
 			req.flash("success", "Task deleted");
 			res.redirect("/task");
 		}
-	})
+		})
+	
+	
 })
 
 module.exports 	= router;

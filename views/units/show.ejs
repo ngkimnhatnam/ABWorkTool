@@ -1,11 +1,23 @@
 <%- include("../partials/header", {date: date}) %>
+<header class="jumbotron" id="jumbo">
+	<h1 id="pageName"><a class="navbar-brand" href="/" id="pageName">Units</a></h1>
+</header>
+	<div class="container" id="flash_mes">
+	<% if(error && error.length > 0){ %>
+		<div class="alert alert-danger" role="alert"><%= error %></div>
+	<% } %>
+	<% if(success && success.length >0){ %>
+		<div class="alert alert-success" role="alert"><%= success %></div>
+	<% } %>
+		</div>
 	<div class="container" id="mainViewContainer">
 		<div class="row">
 			<div class="card" id="unitCardBodyDetail">
 				<img src="<%= unit.image %>" class="card-img-top" alt="...">
 					<div class="card-body">
 						<h5 class="card-title" id="unitNameInUnitCard"><%= unit.name %></h5>
-						<p class="card-text">Check in/out time is: <%=unit.checkinout%></p>
+						<p class="card-text"><strong>Check in/out time is:</strong> <%=unit.checkinout%></p>
+						<p class="card-text"><strong>Unit description:</strong> <%=unit.description%></p>
 				    </div>
 				<div class="container">
 					<div class="row">

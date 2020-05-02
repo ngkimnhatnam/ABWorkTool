@@ -26,11 +26,15 @@ router.get("/",middleware.isLoggedIn, function(req,res){
 router.post("/",middleware.isLoggedIn, function(req,res){
 	Task.findById(req.params.id, function(err,foundTask){
 		if(err){
+			req.flash("error", "Error finding task");
+			res.redirect("back");
 			console.log(err);
 		}else {
-			req.body.feedback = req.sanitize(req.body.feedback)
+			req.body.feedback.text = req.sanitize(req.body.feedback.text)
 			Feedback.create(req.body.feedback, function(err, createdFeedback){
 				if(err){
+					req.flash("error", "Error posting feedback");
+					res.redirect("back");
 					console.log(err);
 				}else {
 					createdFeedback.content = req.body.feedback.text;

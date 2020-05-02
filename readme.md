@@ -26,12 +26,17 @@
 * Refractor codes
 
 #TO BE DONE
-
-
+* Change heading text according to current page DONE
+* Add sidenote to unit creation DONE
+* Check sanitizer DONE
+* Flash error and back() DONE
+* Add register button to side menu master acc DONE
+* Delete confirmation DONE
 
 #Challenges
 * Using two different jquery versions (fadeout dont work on slim version/dropdown dont in full)
 * Using Browserify to use require() in htmls
+* Display date when editing task
 
 
 

@@ -14,6 +14,8 @@ router.get("/",middleware.isLoggedIn, function(req,res){
 	};
 	Unit.find({}, function(err, allUnits){
 		if(err){
+			req.flash("error", "Error loading units");
+			res.redirect("back");
 			console.log(err);
 		}else {
 			res.render("units/", {units: allUnits, date: displayTime, route: toUnit,user: req.user});
@@ -31,11 +33,14 @@ router.post("/",middleware.isLoggedIn, function(req,res){
 	req.body.name			= req.sanitize(req.body.name)
 	req.body.image			= req.sanitize(req.body.image)
 	req.body.checkinout		= req.sanitize(req.body.checkinout)
-	var newUnit = {name: req.body.name,image: req.body.image, checkinout: req.body.checkinout};
+	req.body.description	= req.sanitize(req.body.description)
+	var newUnit = {name: req.body.name,image: req.body.image, checkinout: req.body.checkinout, description: req.body.description};
 	
 	//Create new units and adds to DB
 	Unit.create(newUnit,function(err, newlyCreatedUnit){
 		if(err){
+			req.flash("error", "Error creating unit");
+			res.redirect("back");
 			console.log(err);
 			
 		}else {
@@ -49,6 +54,8 @@ router.post("/",middleware.isLoggedIn, function(req,res){
 router.get("/:id",middleware.isLoggedIn, function(req,res){
 	Unit.findById(req.params.id, function(err, foundUnit){
 		if(err){
+			req.flash("error", "Error finding unit");
+			res.redirect("back");
 			console.log(err);
 		}else {
 			res.render("units/show", {unit: foundUnit, date: displayTime});
@@ -60,6 +67,8 @@ router.get("/:id",middleware.isLoggedIn, function(req,res){
 router.get("/:id/edit",middleware.isLoggedIn, function(req,res){
 	Unit.findById(req.params.id, function(err, foundUnit){
 		if(err){
+			req.flash("error", "Error finding unit");
+			res.redirect("back");
 			console.log(err);
 		}else {
 			res.render("units/edit", {unit: foundUnit, date: displayTime});
@@ -72,7 +81,9 @@ router.put("/:id",middleware.isLoggedIn,function(req,res){
 	req.body.unit	= req.sanitize(req.body.unit)
 	Unit.findByIdAndUpdate(req.params.id,req.body.unit, function(err,updatedUnit){
 		if(err){
-			res.redirect("/unit");
+			req.flash("error", "Error updating unit");
+			res.redirect("back");
+			console.log(err);
 		}else {
 			req.flash("success", "Unit updated");
 			res.redirect("/unit/"+req.params.id);
@@ -84,6 +95,8 @@ router.put("/:id",middleware.isLoggedIn,function(req,res){
 router.delete("/:id",middleware.isLoggedIn, function(req,res){
 	Unit.findByIdAndRemove(req.params.id, function(err){
 		if(err){
+			req.flash("error", "Error deleting unit");
+			res.redirect("back");
 			console.log(err);
 		}else {
 			req.flash("success", "Unit deleted");

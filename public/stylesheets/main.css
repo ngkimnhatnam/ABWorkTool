@@ -293,3 +293,13 @@ body {
 	margin-top: 15px;
 	margin-bottom: 15px;
 }
+
+.modal-body {
+	font-size: 1.1em;
+	font-weight: bold;
+}
+
+.modal-footer {
+	border-top: none;
+	justify-content: center;
+}

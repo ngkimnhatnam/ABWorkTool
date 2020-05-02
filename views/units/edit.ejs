@@ -1,4 +1,15 @@
 <%- include("../partials/header", {date: date}) %>
+<header class="jumbotron" id="jumbo">
+	<h1 id="pageName"><a class="navbar-brand" href="/" id="pageName">Units</a></h1>
+</header>
+	<div class="container" id="flash_mes">
+	<% if(error && error.length > 0){ %>
+		<div class="alert alert-danger" role="alert"><%= error %></div>
+	<% } %>
+	<% if(success && success.length >0){ %>
+		<div class="alert alert-success" role="alert"><%= success %></div>
+	<% } %>
+		</div>
 
 <div class="container" id="mainViewContainer">
 	<div class="row">
@@ -15,6 +26,9 @@
 				</div>
 				<div class="form-group">
 					<input class="form-control" type="text" name="unit[checkinout]" value="<%=unit.checkinout%>">
+				</div>
+				<div class="form-group">
+					<input class="form-control" type="text" name="unit[description]" value="<%=unit.description%>">
 				</div>
 				<div class="form-group">
 					<button class="btn btn-block btn_rectangle btn_add">

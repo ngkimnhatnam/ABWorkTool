@@ -43,60 +43,68 @@ router.post("/register", function(req,res){
 		var newUser = new User({username: req.body.username,nickname: req.body.nickname, isManager: false});
 	}	
 	req.body.password = req.sanitize(req.body.password)
-	//Create new user and adds to DB
-	User.register(newUser, req.body.password,function(err,newlyCreatedUser){
-		if(err){
-			console.log(err);
-			return res.render("/register");
-		}
-		passport.authenticate("local")(req,res,function(){
-			req.flash("success", "Account successfully created");
-			res.redirect("/");
-		})
-
-		// let transport = nodemailer.createTransport({
-		// 	// service: "gmail",
-		// 	// auth: {
-		// 	// user: 'ngkimnhatnam@gmail.com',
-		// 	// pass: 'Ngkimnhatnam92'
-		// 	// }
-		// 	host: 'smtp.mailtrap.io',
-		// 	port: 2525,
-		// 	auth: {
-		// 	user: '48aabd7aa3cb7c',
-		// 	pass: '21881e8e51e9d6'}
-		// })
-
-		const Email = require('email-templates');
-		const email = new Email({
-			// uncomment below to send emails in development/test env:
-			send: true,
-			transport: {
-				host: 'smtp.mailtrap.io',
-				port: 2525,
-				auth: {
-				user: '48aabd7aa3cb7c',
-				pass: '21881e8e51e9d6'}
+	if(!req.body.password){
+		req.flash("error", "Password cannot be empty");
+		res.redirect("back");
+	}else {
+		//Create new user and adds to DB
+		User.register(newUser, req.body.password,function(err,newlyCreatedUser){
+			if(err){
+				req.flash("error", "Error creating user");
+				console.log(err);
+				return res.render("/register", {error: err.message});
 			}
+			passport.authenticate("local")(req,res,function(){
+				req.flash("success", "Account successfully created");
+				res.redirect("/");
+			})
+
+			// let transport = nodemailer.createTransport({
+			// 	// service: "gmail",
+			// 	// auth: {
+			// 	// user: 'ngkimnhatnam@gmail.com',
+			// 	// pass: 'Ngkimnhatnam92'
+			// 	// }
+			// 	host: 'smtp.mailtrap.io',
+			// 	port: 2525,
+			// 	auth: {
+			// 	user: '48aabd7aa3cb7c',
+			// 	pass: '21881e8e51e9d6'}
+			// })
+
+			const Email = require('email-templates');
+			const email = new Email({
+				// uncomment below to send emails in development/test env:
+				send: true,
+				transport: {
+					host: 'smtp.mailtrap.io',
+					port: 2525,
+					auth: {
+					user: '48aabd7aa3cb7c',
+					pass: '21881e8e51e9d6'}
+				}
+			});
+
+			email
+			.send({
+			template: 'accountCreation',
+			message: {
+				from: 'account@airbnbtool.com',
+				to: req.body.username
+			},
+				locals: {
+					username: req.body.username,
+					nickname: req.body.nickname,
+					password: req.body.password,
+					link:	'https://piupiu.run-eu-central1.goorm.io/'
+				}
+			})
+			.then(console.log)
+			.catch(console.error);			
 		});
-
-		email
-		.send({
-		template: 'accountCreation',
-		message: {
-			from: 'account@airbnbtool.com',
-			to: req.body.username
-		},
-			locals: {
-				username: req.body.username,
-				nickname: req.body.nickname,
-				password: req.body.password,
-				link:	'https://piupiu.run-eu-central1.goorm.io/'
-			}
-		})
-		.then(console.log)
-		.catch(console.error);			
-	});
+		
+	}
+	
 })
 
 //This route handles login
@@ -112,6 +120,7 @@ router.post("/login", passport.authenticate("local",
 //logout route
 router.get("/logout", function(req,res){
 	req.logout();
+	req.flash("success", "Logged out successfully");
 	res.redirect("/");
 })
 
@@ -173,6 +182,9 @@ router.post("/reclaim_password", function(req,res){
 				  })
 				  .then(console.log)
 				  .catch(console.error);		
+			}else {
+				req.flash("error", "No username found");
+				res.redirect("back");
 			}
 		})
 		req.flash("success", "Password reset confirmation sent to your email.");
@@ -197,11 +209,17 @@ router.put("/reset_password/:id", function(req,res){
 	req.body.password	= req.sanitize(req.body.password)
 	req.body.retype		= req.sanitize(req.body.retype)
 	if(req.body.password !== req.body.retype){
+		req.flash("error", "Confirming password doesn't match");
 		res.redirect("/reset_password/"+req.params.id);
 	}else {
-		
-		User.findById(req.params.id,function(err, updatedUser){
+		if(!req.body.password){
+			req.flash("error", "Password cannot be empty");
+			res.redirect("back");
+		}else {
+			User.findById(req.params.id,function(err, updatedUser){
 			if(err){
+				req.flash("error", "Error finding user");
+				res.redirect("back");
 				console.log(err);
 			}else {
 				updatedUser.setPassword(req.body.password, function(){
@@ -210,7 +228,9 @@ router.put("/reset_password/:id", function(req,res){
 				req.flash("success","You reset password successfully!");
 				res.redirect("/");
 			}
-		})	
+			})	
+		}
+		
 	}
 })
 	
@@ -221,7 +241,6 @@ router.get("/change_password/:id", function(req,res){
 		if(err){
 			console.log(err);
 		}else {
-			console.log(foundUser);
 			res.render("settings/pwchange", {user: foundUser, date: displayTime});
 		}
 	})
@@ -231,12 +250,19 @@ router.get("/change_password/:id", function(req,res){
 router.put("/change_password/:id", function(req,res){
 	req.body.password	= req.sanitize(req.body.password)
 	req.body.retype		= req.sanitize(req.body.retype)
+	console.log("Changed password..."+ req.body.password);
 	if(req.body.password !== req.body.retype){
+		req.flash("error", "Confirming password doesn't match");
 		res.redirect("/change_password/"+req.params.id);
 	}else {
-		
-		User.findById(req.params.id,function(err, updatedUser){
+		if(!req.body.password){
+			req.flash("error", "Password cannot be empty");
+			res.redirect("back");
+		}else {
+			User.findById(req.params.id,function(err, updatedUser){
 			if(err){
+				req.flash("error", "Error finding user");
+				res.redirect("back");
 				console.log(err);
 			}else {
 				updatedUser.setPassword(req.body.password, function(){
@@ -246,6 +272,8 @@ router.put("/change_password/:id", function(req,res){
 				res.redirect("/task");
 			}
 		})	
+		}
+		
 	}
 })
 
