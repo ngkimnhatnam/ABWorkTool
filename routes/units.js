@@ -31,6 +31,7 @@ router.get("/new",middleware.isLoggedIn, function(req,res){
 //CREATE UNIT
 router.post("/",middleware.isLoggedIn, function(req,res){
 	req.body.name			= req.sanitize(req.body.name)
+	req.body.name.toString()
 	req.body.image			= req.sanitize(req.body.image)
 	req.body.checkinout		= req.sanitize(req.body.checkinout)
 	req.body.description	= req.sanitize(req.body.description)
