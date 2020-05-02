@@ -15,8 +15,8 @@ var express 			= require("express"),
 	mongoClient 		= require('mongodb').MongoClient,  
 	url 				= "mongodb://localhost",  
 	dbName 				= "airbnb",
-	//url					= "mongodb+srv://ngkimnhatnam:Nhatnam92@airbnbworktoolcluster-lkprs.mongodb.net",
-	//dbName				= "airbnbworktool",
+	// url					= "mongodb+srv://ngkimnhatnam:Nhatnam92@airbnbworktoolcluster-lkprs.mongodb.net",
+	// dbName				= "airbnbworktool",
 	sortMethod 			= "date",
 	app 				= express();
 	
@@ -30,9 +30,9 @@ var thisMoment = new Date();
 thisMoment.setHours(0,0,0,0);
 var minDate = moment().format("YYYY-MM-DD");
 var displayTime = moment().format("ddd DD MMM YYYY");
- 
- mongoose.connect("mongodb://localhost/airbnb",{ useNewUrlParser: true, useUnifiedTopology: true });
-// mongoose.connect("mongodb+srv://ngkimnhatnam:Nhatnam92@airbnbworktoolcluster-lkprs.mongodb.net/airbnbworktool?retryWrites=true&w=majority",{ useNewUrlParser: true, useUnifiedTopology: true });
+
+mongoose.connect(process.env.DATABASEURL,{ useNewUrlParser: true, useUnifiedTopology: true });
+ // mongoose.connect("mongodb+srv://ngkimnhatnam:Nhatnam92@airbnbworktoolcluster-lkprs.mongodb.net/airbnbworktool?retryWrites=true&w=majority",{ useNewUrlParser: true, useUnifiedTopology: true });
 
 
 app.use(bodyParser.urlencoded({extended: true}));
@@ -72,7 +72,7 @@ app.use("/task/:id/feedback", feedbackRoutes);
 app.use(indexRoutes);
 
 
-//var port = process.env.PORT || 3000;
-app.listen(3000, function () {
+var port = process.env.PORT || 3000;
+app.listen(port, function () {
   console.log("Server Has Started!");
 });
