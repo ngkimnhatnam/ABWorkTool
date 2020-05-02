@@ -52,8 +52,7 @@ router.post("/register", function(req,res){
 		User.register(newUser, req.body.password,function(err,newlyCreatedUser){
 			if(err){
 				req.flash("error", err.message);
-				console.log(err);
-				res.redirect("/register");
+				return res.render("register");
 			}
 			passport.authenticate("local")(req,res,function(){
 				req.flash("success", "Account successfully created");
