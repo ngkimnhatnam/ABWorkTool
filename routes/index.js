@@ -129,8 +129,8 @@ router.post("/reclaim_password", function(req,res){
 			req.flash("error", err.message);
 			res.redirect("back");
 		}else {
-			allUsers.forEach(function(user){
-				if(user.username===req.body.username){
+			for(var i=0;i<allUsers.length;i++){
+				if(allUsers[i].username===req.body.username){
 					const Email = require('email-templates');
 					const email = new Email({
 
@@ -153,7 +153,7 @@ router.post("/reclaim_password", function(req,res){
 							to: req.body.username
 						},
 						locals: {
-							nickname: user.nickname,
+							nickname: allUsers[i].nickname,
 							link:	'https://arcane-tundra-61659.herokuapp.com/reset_password/'+user._id
 						}
 					  })
@@ -162,14 +162,15 @@ router.post("/reclaim_password", function(req,res){
 					
 					req.flash("success", "Password reset confirmation sent to your email.");
 					res.redirect("/");
-
+					
 				}else {
 					req.flash("error", "No username found");
 					res.redirect("/reclaim_password");
-
+					
 				}
-				
-			})
+				break;
+			}
+	
 		}
 		
 	});
