@@ -124,6 +124,7 @@ router.get("/reclaim_password",function(req,res){
 //POST PW RETRIEVAL
 router.post("/reclaim_password", function(req,res){
 	req.body.username = req.sanitize(req.body.username)
+	var foundUser = false;
 	User.find({}, function(err,allUsers){
 		if(err){
 			req.flash("error", err.message);
@@ -162,13 +163,15 @@ router.post("/reclaim_password", function(req,res){
 					
 					req.flash("success", "Password reset confirmation sent to your email.");
 					res.redirect("/");
+					foundUser = true;
 					break;
 				}
 				
 			}
-			req.flash("error", "No username found");
-			res.redirect("/reclaim_password");
-					
+			if(foundUser){
+				req.flash("error", "No username found");
+				res.redirect("/reclaim_password");
+			}			
 		}
 		
 	});
