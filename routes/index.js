@@ -154,7 +154,7 @@ router.post("/reclaim_password", function(req,res){
 						},
 						locals: {
 							nickname: allUsers[i].nickname,
-							link:	'https://arcane-tundra-61659.herokuapp.com/reset_password/'+user._id
+							link:	'https://arcane-tundra-61659.herokuapp.com/reset_password/'+allUsers[i]._id
 						}
 					  })
 					  .then(console.log)
