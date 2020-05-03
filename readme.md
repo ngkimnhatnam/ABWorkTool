@@ -37,6 +37,7 @@
 * Using two different jquery versions (fadeout dont work on slim version/dropdown dont in full)
 * Using Browserify to use require() in htmls
 * Display date when editing task
+* Escape & in texts
 
 
 

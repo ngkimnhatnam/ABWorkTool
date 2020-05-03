@@ -286,6 +286,10 @@ body {
 	font-weight: bold;
 }
 
+#sortingButtonElement {
+	margin-top: 10px;
+}
+
 #backLink {
 	justify-content: center;
 	color: #19568b;

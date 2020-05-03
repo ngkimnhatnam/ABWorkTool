@@ -1,4 +1,7 @@
 <%- include("../partials/header", {date: date}) %>
+	<header class="jumbotron" id="jumbo">
+		<h1 id="pageName"><a class="navbar-brand" href="/" id="pageName">Sorting Options</a></h1>
+	</header>
 	<div class="container" id="mainViewContainer">
 		<div class="row">
 			<div class="col-4 col-sm-2">
@@ -23,13 +26,13 @@
 						<form action="/sort_option" method="POST">
 							<div class="form-group">
 								<div class="row">
-									<legend class="col-form-label col-sm-3 pt-0">Select one option:</legend>
+									<legend class="col-form-label col-sm-3">Select one option:</legend>
 									<div class="col-sm-9">
 										<div class="row">
-											<div class="col-xs-6 col-sm-6 col-md-4">
+											<div class="col-xs-6 col-sm-6 col-md-4" id="sortingButtonElement">
 												<a class="btn btn-block btn_rectangle btn_sortOptions" href="/task">By date</a>
 											</div>
-											<div class="col-xs-6 col-sm-6 col-md-4">
+											<div class="col-xs-6 col-sm-6 col-md-4" id="sortingButtonElement">
 												<div>
 													<div class="dropdown">
 														<a class="btn btn-block btn_rectangle btn_sortOptions dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">By unit</a>
@@ -41,7 +44,7 @@
 													</div>
 												</div>
 											</div>
-											<div class="col-xs-6 col-sm-6 col-md-4">
+											<div class="col-xs-6 col-sm-6 col-md-4" id="sortingButtonElement">
 												<% if(currentUser&&currentUser.isManager){%>
 												<div>
 												  <div class="dropdown">

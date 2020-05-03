@@ -1,4 +1,7 @@
 <%- include("../partials/header", {date: date}) %>
+	<header class="jumbotron" id="jumbo">
+			<h1 id="pageName"><a class="navbar-brand" href="/" id="pageName">Password Change</a></h1>
+	</header>
 	<div class="container" id="mainViewContainer">
 		<div class="row">
 			<div class="col-4">
@@ -20,7 +23,7 @@
 			<div class="col-8">
 				<div class="row">
 					<div class="container">
-						<h2>Change your password here:</h2>
+						<h2 style="margin-bottom: 20px;">Change your password here:</h2>
 						<form action="/change_password/<%=user._id%>?_method=PUT" method="POST">
 							<div class="form-group">
 								<input class="form-control" type="password" name="password" placeholder="New password:" required>
