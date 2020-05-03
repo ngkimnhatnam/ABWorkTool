@@ -97,7 +97,9 @@ router.post("/register", function(req,res){
 router.post("/login", passport.authenticate("local", 
 	{
 	successRedirect: "/task",
-	failureRedirect: "/"
+	failureRedirect: "/",
+	badRequestMessage : "Wrong username or password.",
+	failureFlash: true
 	}),
 	function(req,res){
 		
@@ -334,7 +336,6 @@ router.get("/sort_option/unit/:id",middleware.isLoggedIn, function(req,res){
 						if (err){
 							throw err;
 						}else {
-							
 							result.forEach(function(task){
 								task.date.setHours(0,0,0,0);
 								if(task.date.getTime()>= thisMoment.getTime()){
