@@ -125,45 +125,53 @@ router.get("/reclaim_password",function(req,res){
 router.post("/reclaim_password", function(req,res){
 	req.body.username = req.sanitize(req.body.username)
 	User.find({}, function(err,allUsers){
-		allUsers.forEach(function(user){
-			if(user.username===req.body.username){
-				const Email = require('email-templates');
-				const email = new Email({
+		if(err){
+			req.flash("error", err.message);
+			res.redirect("back");
+		}else {
+			allUsers.forEach(function(user){
+				if(user.username===req.body.username){
+					const Email = require('email-templates');
+					const email = new Email({
 
-				  // uncomment below to send emails in development/test env:
-				  send: true,
-				  transport: {
-					service: "gmail",
-					auth: {
-					user: 'abworktool@gmail.com',
-					pass: 'Nhatnam92'
-					}
-				  }
-				});
+					  // uncomment below to send emails in development/test env:
+					  send: true,
+					  transport: {
+						service: "gmail",
+						auth: {
+						user: 'abworktool@gmail.com',
+						pass: 'Nhatnam92'
+						}
+					  }
+					});
 
-				email
-				  .send({
-					template: 'resetPass',
-					message: {
-						from: 'abworktool@gmail.com',
-						to: req.body.username
-						
-					},
-					locals: {
-						nickname: user.nickname,
-						link:	'https://arcane-tundra-61659.herokuapp.com/reset_password/'+user._id
-					}
-				  })
-				  .then(console.log)
-				  .catch(console.error);	
+					email
+					  .send({
+						template: 'resetPass',
+						message: {
+							from: 'abworktool@gmail.com',
+							to: req.body.username
+						},
+						locals: {
+							nickname: user.nickname,
+							link:	'https://arcane-tundra-61659.herokuapp.com/reset_password/'+user._id
+						}
+					  })
+					  .then(console.log)
+					  .catch(console.error);	
+					
+					req.flash("success", "Password reset confirmation sent to your email.");
+					res.redirect("/");
+
+				}else {
+					req.flash("error", "No username found");
+					res.redirect("/reclaim_password");
+
+				}
 				
-				req.flash("success", "Password reset confirmation sent to your email.");
-				res.redirect("/");
-			}else {
-				req.flash("error", "No username found");
-				res.redirect("back");
-			}
-		})
+			})
+		}
+		
 	});
 })
 
