@@ -155,14 +155,15 @@ router.post("/reclaim_password", function(req,res){
 					}
 				  })
 				  .then(console.log)
-				  .catch(console.error);		
+				  .catch(console.error);	
+				
+				req.flash("success", "Password reset confirmation sent to your email.");
+				res.redirect("/");
 			}else {
 				req.flash("error", "No username found");
 				res.redirect("back");
 			}
 		})
-		req.flash("success", "Password reset confirmation sent to your email.");
-		res.redirect("/");
 	});
 })
 
