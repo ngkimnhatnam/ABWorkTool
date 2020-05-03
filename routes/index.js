@@ -162,15 +162,13 @@ router.post("/reclaim_password", function(req,res){
 					
 					req.flash("success", "Password reset confirmation sent to your email.");
 					res.redirect("/");
-					
-				}else {
-					req.flash("error", "No username found");
-					res.redirect("/reclaim_password");
-					
+					break;
 				}
-				break;
+				
 			}
-	
+			req.flash("error", "No username found");
+			res.redirect("/reclaim_password");
+					
 		}
 		
 	});
