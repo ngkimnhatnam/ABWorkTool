@@ -168,7 +168,7 @@ router.post("/reclaim_password", function(req,res){
 				}
 				
 			}
-			if(foundUser){
+			if(foundUser === false){
 				req.flash("error", "No username found");
 				res.redirect("/reclaim_password");
 			}			
