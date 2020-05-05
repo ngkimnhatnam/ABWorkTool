@@ -10,10 +10,8 @@ var express 			= require("express"),
 	Task 				= require("../models/task"),
 	User				= require("../models/user"),
 	Feedback			= require("../models/feedback"),
-	// url 				= "mongodb://localhost",  
-	// dbName 				= "airbnb",
-	url					= "mongodb+srv://ngkimnhatnam:Nhatnam92@airbnbworktoolcluster-lkprs.mongodb.net",
-	dbName				= "airbnbworktool",
+	//yourDBURL here,
+	//yourDBName here,
 	thisMoment 			= new Date(),
 	minDate 			= moment().format("YYYY-MM-DD"),
 	middleware			= require("../middleware/index");
@@ -64,10 +62,7 @@ router.post("/register", function(req,res){
 					// uncomment below to send emails in development/test env:
 					send: true,
 					transport: {
-						service: "gmail",
-						auth: {
-						user: 'abworktool@gmail.com',
-						pass: 'Nhatnam92'
+							//Mail transport service here
 						}
 					}
 				});
@@ -76,14 +71,14 @@ router.post("/register", function(req,res){
 				.send({
 				template: 'accountCreation',
 				message: {
-					from: 'abworktool@gmail.com',
+					from: //your app email,
 					to: req.body.username
 				},
 					locals: {
 						username: req.body.username,
 						nickname: req.body.nickname,
 						password: req.body.password,
-						link:	'https://arcane-tundra-61659.herokuapp.com/'
+						link:	//your app link
 					}
 				})
 				.then(console.log)
@@ -138,11 +133,7 @@ router.post("/reclaim_password", function(req,res){
 					  // uncomment below to send emails in development/test env:
 					  send: true,
 					  transport: {
-						service: "gmail",
-						auth: {
-						user: 'abworktool@gmail.com',
-						pass: 'Nhatnam92'
-						}
+						//Mail transport service
 					  }
 					});
 
@@ -150,12 +141,12 @@ router.post("/reclaim_password", function(req,res){
 					  .send({
 						template: 'resetPass',
 						message: {
-							from: 'abworktool@gmail.com',
+							from: //your app email,
 							to: req.body.username
 						},
 						locals: {
 							nickname: allUsers[i].nickname,
-							link:	'https://arcane-tundra-61659.herokuapp.com/reset_password/'+allUsers[i]._id
+							link:	//your app link +allUsers[i]._id
 						}
 					  })
 					  .then(console.log)

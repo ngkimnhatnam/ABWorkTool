@@ -13,11 +13,9 @@ var express 			= require("express"),
 	flash				= require("connect-flash"),
 	expressSanitizer 	= require("express-sanitizer"),
 	mongoClient 		= require('mongodb').MongoClient,  
-	// url 				= "mongodb://localhost",  
-	// dbName 				= "airbnb",
-	url					= "mongodb+srv://ngkimnhatnam:Nhatnam92@airbnbworktoolcluster-lkprs.mongodb.net",
-	dbName				= "airbnbworktool",
 	sortMethod 			= "date",
+	//yourDBURL here,
+	//yourDBName here,
 	app 				= express();
 	
 //requiring routes
@@ -43,7 +41,7 @@ app.use(flash());
 
 //PASSPORT CONFIGURATION
 app.use(require("express-session")({
-	secret:"Piu is super kute",
+	secret:"Your hash sequence here",
 	resave: false,
 	saveUninitialized: false
 }));
