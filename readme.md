@@ -1,9 +1,10 @@
 #Work tool for AirBnb management
+#Checkout working version at https://arcane-tundra-61659.herokuapp.com/
 
 #Stacks to be used:
-	* Front-end: HTML,CSS, JS, Bootstrap, jQuery
-	* Backend: NodeJS, Express, Mongoose
-	* Database: MongoDB
+* Front-end: HTML,CSS, JS, Bootstrap, jQuery
+* Backend: NodeJS, Express, Mongoose
+* Database: MongoDB
 	
 #RESTful routes
 
