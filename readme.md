@@ -29,6 +29,10 @@
 
 Screenshots:
 ![Screenshot 2020-06-01 at 16 43 50](https://user-images.githubusercontent.com/33937304/83415041-26366400-a427-11ea-9997-91db15e2445a.png)
+![Screenshot 2020-06-01 at 16 46 15](https://user-images.githubusercontent.com/33937304/83415213-71e90d80-a427-11ea-9230-c3117d29cfe9.png)
+![Screenshot 2020-06-01 at 16 47 03](https://user-images.githubusercontent.com/33937304/83415483-c7251f00-a427-11ea-80fe-cfc1d87587cb.png)
+![Screenshot 2020-06-01 at 16 48 36](https://user-images.githubusercontent.com/33937304/83415505-d015f080-a427-11ea-95f6-fcff4b299142.png)
+![Screenshot 2020-06-01 at 16 50 20](https://user-images.githubusercontent.com/33937304/83415620-05bad980-a428-11ea-8994-4bb62e4980bc.png)
 
 
 
