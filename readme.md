@@ -27,6 +27,10 @@
 * Refractor codes
 * Delete confirmation via Bootstrap Modal
 
+Screenshots:
+![Screenshot 2020-06-01 at 16 43 50](https://user-images.githubusercontent.com/33937304/83415041-26366400-a427-11ea-9997-91db15e2445a.png)
+
+
 
 
 
